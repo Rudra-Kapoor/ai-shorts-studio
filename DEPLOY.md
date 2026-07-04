@@ -41,3 +41,21 @@ git push -u origin main
 ]
 ```
 *(After Vercel is live, replace `"*"` with your Vercel URL to lock it down.)*
+
+---
+
+## 2) MongoDB Atlas — database (free 512MB)
+
+1. Create a free **M0** cluster.
+2. **Database Access** → add a user + password. 📋 Save them.
+3. **Network Access** → *Add IP* → **`0.0.0.0/0`** (allow anywhere — needed for serverless).
+4. **Connect → Drivers** → 📋 copy the `mongodb+srv://…` connection string
+   (put your password into it where it says `<password>`).
+
+---
+
+## 3) Upstash Redis — job queue (free)
+
+1. Create a **Redis** database (any region).
+2. Scroll to **REST API** → 📋 copy **UPSTASH_REDIS_REST_URL** and **UPSTASH_REDIS_REST_TOKEN**
+   (the REST ones — not the `redis://` one).
