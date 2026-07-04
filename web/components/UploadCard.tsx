@@ -164,3 +164,32 @@ export default function UploadCard({
           YouTube link
         </button>
       </div>
+
+      <div className="mt-4 grid gap-3">
+        <input
+          className="input"
+          placeholder="Title (optional)"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+
+        <div>
+          <label className="mb-1 block text-xs text-gray-400">Caption style</label>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {STYLES.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => setCaptionStyle(s.id)}
+                className={`rounded-xl border p-2 text-left transition ${
+                  captionStyle === s.id
+                    ? "border-brand bg-brand/10"
+                    : "border-edge hover:border-gray-500"
+                }`}
+              >
+                <div className="text-sm font-medium">{s.label}</div>
+                <div className="text-[11px] text-gray-400">{s.hint}</div>
+              </button>
+            ))}
+          </div>
+        </div>
