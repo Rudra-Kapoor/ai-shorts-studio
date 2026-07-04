@@ -22,3 +22,20 @@ export default function Home() {
       /* non-critical */
     }
   }
+
+  async function syncUser(id: Identity) {
+    // Upsert the user record on sign-in, then load their quota.
+    await fetch("/api/user", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ userId: id.userId, email: id.email }),
+    }).catch(() => {});
+    loadUsage(id);
+  }
+
+  useEffect(() => {
+    const id = getIdentity();
+    setMe(id);
+    setReady(true);
+    if (id) syncUser(id);
+  }, []);
