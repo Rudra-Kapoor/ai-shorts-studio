@@ -129,3 +129,19 @@ def _windows(segments, budget):
     if cur:
         windows.append(cur)
     return windows
+
+
+def find_clips(segments, duration: float) -> list:
+    if not config.GROQ_API_KEY:
+        raise RuntimeError("GROQ_API_KEY is not set")
+    if not segments:
+        return []
+
+    windows = _windows(segments, CHAR_BUDGET)
+    # On very long videos, merge windows so we make at most MAX_WINDOWS calls.
+    if len(windows) > MAX_WINDOWS:
+        group = len(windows) // MAX_WINDOWS + 1
+        windows = [
+            [s for w in windows[i:i + group] for s in w]
+            for i in range(0, len(windows), group)
+        ]
