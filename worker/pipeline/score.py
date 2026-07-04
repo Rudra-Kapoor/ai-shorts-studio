@@ -93,3 +93,23 @@ def _parse_json(content: str) -> dict:
             except json.JSONDecodeError:
                 pass
     return {"clips": []}
+
+
+def _call_llm(seg_lines, duration, n) -> list:
+    body = {
+        "model": config.GROQ_LLM_MODEL,
+        "temperature": 0.3,
+        "response_format": {"type": "json_object"},
+        "messages": [
+            {"role": "system", "content": SYSTEM},
+            {"role": "user", "content": _prompt(
+                seg_lines, duration, config.MIN_CLIP_SEC, config.MAX_CLIP_SEC, n)},
+        ],
+    }
+    r = ai.post_with_retry(
+        f"{config.GROQ_BASE}/chat/completions",
+        headers={"Authorization": f"Bearer {config.GROQ_API_KEY}"},
+        json=body, timeout=120,
+    )
+    content = r.json()["choices"][0]["message"]["content"]
+    return _parse_json(content).get("clips", [])
