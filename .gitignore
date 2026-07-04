@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Next.js
+web/.next/
+web/out/
+web/build/
+web/next-env.d.ts
+
+# Env / secrets
+.env
+.env.local
+.env*.local
+*.local
