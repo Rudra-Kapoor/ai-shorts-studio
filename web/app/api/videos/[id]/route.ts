@@ -68,3 +68,21 @@ export async function POST(
 
   return NextResponse.json({ ok: true });
 }
+
+// DELETE /api/videos/:id  → remove the video, its clips, and all R2 objects.
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const db = await getDb();
+  const video = await db
+    .collection(Collections.videos)
+    .findOne({ _id: params.id as any });
+  if (!video) {
+    return NextResponse.json({ error: "not found" }, { status: 404 });
+  }
+
+  const clips = await db
+    .collection(Collections.clips)
+    .find({ videoId: params.id })
+    .toArray();
