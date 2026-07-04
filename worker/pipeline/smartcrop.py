@@ -18,3 +18,23 @@ def face_center_frac(frame_paths) -> "float | None":
         import cv2  # lazy: optional dependency
     except Exception:
         return None
+
+    cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+    detector = cv2.CascadeClassifier(cascade_path)
+    if detector.empty():
+        return None
+
+    centers = []
+    for p in frame_paths:
+        img = cv2.imread(p)
+        if img is None:
+            continue
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        h, w = gray.shape[:2]
+        faces = detector.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5,
+                                           minSize=(40, 40))
+        if len(faces) == 0:
+            continue
+        # Use the largest face in the frame.
+        fx, fy, fw, fh = max(faces, key=lambda b: b[2] * b[3])
+        centers.append((fx + fw / 2) / float(w))
