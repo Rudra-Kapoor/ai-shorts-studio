@@ -75,3 +75,21 @@ Return STRICT JSON of this exact shape:
     }}
   ]
 }}
+
+Transcript (timestamps in seconds):
+{transcript}
+"""
+
+
+def _parse_json(content: str) -> dict:
+    """Be forgiving — strip code fences / extract the JSON object if needed."""
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError:
+        m = re.search(r"\{.*\}", content, re.DOTALL)
+        if m:
+            try:
+                return json.loads(m.group(0))
+            except json.JSONDecodeError:
+                pass
+    return {"clips": []}
