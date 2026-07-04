@@ -54,3 +54,15 @@ docker compose restart worker     # after editing worker/.env.worker.local
 docker compose down               # stop (keeps data)
 docker compose down -v            # stop and wipe DB/storage
 ```
+
+- MinIO console: http://localhost:9001  (user `localminio`, pass `localminio123`)
+- Worker health: http://localhost:8000/health
+
+## Notes
+
+- The local env files (`worker/.env.worker.local`, `web/.env.local`) are
+  git-ignored — your keys stay on your machine.
+- The only code added for local dev is an optional `R2_ENDPOINT` override (so the
+  S3 client can point at MinIO). With it unset, the app behaves exactly as the
+  cloud build, so nothing here changes a real R2/Vercel/Render deploy.
+- Keep test clips short on a laptop CPU — FFmpeg rendering is the slow step.
