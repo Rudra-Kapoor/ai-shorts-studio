@@ -169,3 +169,20 @@ def process_job(video_id: str, user_id: str) -> None:
         storage.update_video(video_id, status="processing", stage="Downloading video", progress=5)
         src = os.path.join(tmp, "source.mp4")
         _obtain_source(video, video_id, user_id, src)
+
+        media = edit.probe_media(src)          # one ffprobe → duration + dims + audio
+        duration = media["duration"]
+        storage.update_video(video_id, durationSec=duration)
+        if not media["has_audio"]:
+            raise RuntimeError("This video has no audio track — can't transcribe it.")
+
+        # Idempotent: clear any clips left over from a previous/failed attempt.
+        storage.delete_clips(video_id)
+
+        # Transcription Agent (auto-chunks long videos)
+        storage.update_video(video_id, stage="Transcribing (Whisper)", progress=15)
+        audio = transcribe.extract_audio(src, os.path.join(tmp, "audio.mp3"))
+        tr = transcribe.transcribe(audio)
+        if not tr["segments"]:
+            storage.update_video(video_id, status="done", stage="No speech detected", progress=100)
+            return
