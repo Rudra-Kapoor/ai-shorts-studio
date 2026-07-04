@@ -59,3 +59,20 @@ git push -u origin main
 1. Create a **Redis** database (any region).
 2. Scroll to **REST API** → 📋 copy **UPSTASH_REDIS_REST_URL** and **UPSTASH_REDIS_REST_TOKEN**
    (the REST ones — not the `redis://` one).
+
+---
+
+## 4) Groq — transcription + LLM (free)
+
+1. https://console.groq.com → **API Keys** → Create. 📋 Save the `gsk_…` key.
+
+## 5) Google Gemini — captions + trends (free)
+
+1. https://aistudio.google.com/app/apikey → Create API key. 📋 Save the `AIza…` key.
+
+## 6) Make a worker secret
+
+📋 Invent a long random string, e.g. `s7f9-Kd2p-Wq8x-Zr4m-Lv6n`. You'll paste the
+**same** value into Render *and* Vercel.
+
+---
