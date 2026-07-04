@@ -32,3 +32,23 @@ def download_youtube(url: str, out_path: str) -> dict:
         "socket_timeout": 30,
         "retries": 3,
     }
+
+    with yt_dlp.YoutubeDL(opts) as ydl:
+        info = ydl.extract_info(url, download=True)
+
+    # If a playlist/channel slipped through, take the first entry's metadata.
+    if isinstance(info, dict) and info.get("entries"):
+        entries = [e for e in info["entries"] if e]
+        info = entries[0] if entries else info
+
+    produced = work_base + ".mp4"
+    if not os.path.exists(produced):
+        # Remux/merge may have left a different extension — grab the largest.
+        cands = sorted(
+            (p for p in glob.glob(work_base + ".*") if os.path.isfile(p)),
+            key=os.path.getsize,
+            reverse=True,
+        )
+        if not cands:
+            raise RuntimeError("yt-dlp produced no output file")
+        produced = cands[0]
