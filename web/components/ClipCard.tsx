@@ -46,3 +46,24 @@ export default function ClipCard({ clip }: { clip: Clip }) {
       setPosting(null);
     }
   }
+
+  return (
+    <div className="card overflow-hidden">
+      <div
+        className="w-full bg-black"
+        style={{ aspectRatio: (clip.aspectRatio || "9:16").replace(":", " / ") }}
+      >
+        {clip.editedUrl ? (
+          <video
+            src={clip.editedUrl}
+            poster={clip.thumbnailUrl}
+            controls
+            playsInline
+            className="h-full w-full object-contain"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center text-sm text-gray-500">
+            {clip.status === "failed" ? "render failed" : "rendering…"}
+          </div>
+        )}
+      </div>
