@@ -31,3 +31,26 @@ The Docker stack replaces the cloud services 1:1:
 2. Make sure **Docker Desktop** is running.
 
 ## Start it
+
+```powershell
+# 1) backing services + worker (first run builds the worker image)
+docker compose up -d --build
+
+# 2) the web app (host)
+cd web
+npm install        # first time only
+npm run dev        # http://localhost:3000
+```
+
+Open http://localhost:3000, sign in with any email, pick a style, upload a short
+video, and watch the clips appear.
+
+## Handy
+
+```powershell
+docker compose logs -f worker     # watch the pipeline run
+docker compose ps                 # service status
+docker compose restart worker     # after editing worker/.env.worker.local
+docker compose down               # stop (keeps data)
+docker compose down -v            # stop and wipe DB/storage
+```
