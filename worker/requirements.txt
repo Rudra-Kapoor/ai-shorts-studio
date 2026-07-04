@@ -1,0 +1,10 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+requests==2.32.3
+boto3==1.35.0
+pymongo==4.8.0
+dnspython==2.6.1
+# YouTube / URL ingestion. Unpinned on purpose: YouTube changes often and only
+# recent yt-dlp releases keep working. Pin a version only if you need fully
+# reproducible builds and will bump it whenever extraction breaks.
+yt-dlp
