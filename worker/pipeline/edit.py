@@ -72,3 +72,20 @@ def _crop_filter(crop_frac, dims, W, H):
         x = int(min(max(crop_frac * scaled_w - W / 2, 0), scaled_w - W))
         return f"crop={W}:{H}:{x}:0"
     return f"crop={W}:{H}"
+
+
+def render_clip(src_video: str, start: float, end: float, ass_path: str,
+                out_path: str, crop_frac=None, dims=None,
+                out_w: int = None, out_h: int = None) -> str:
+    """Trim [start, end], scale + crop to out_w x out_h (9:16 by default), burn
+    captions."""
+    W = out_w or config.OUT_W
+    H = out_h or config.OUT_H
+    duration = max(0.5, end - start)
+    work_dir = os.path.dirname(os.path.abspath(ass_path)) or "."
+    ass_name = os.path.basename(ass_path)
+
+    # Fast input-seek to ~SEEK_PAD before the start (skips decoding the rest of
+    # the video), then an accurate output-seek for the remainder.
+    fast = max(0.0, start - SEEK_PAD)
+    rem = start - fast
