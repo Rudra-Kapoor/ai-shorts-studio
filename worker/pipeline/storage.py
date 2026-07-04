@@ -84,3 +84,21 @@ def delete_clips(video_id: str) -> int:
     """Remove a video's existing clips — so reprocessing/retry doesn't pile up
     duplicates."""
     return clips.delete_many({"videoId": video_id}).deleted_count
+
+
+# --- Trends (Phase 3) ---
+def all_trends() -> list:
+    return list(trends.find({}))
+
+
+def upsert_trend(trend: dict) -> None:
+    trends.update_one({"_id": trend["_id"]}, {"$set": trend}, upsert=True)
+
+
+def ensure_indexes() -> None:
+    """Idempotent — keeps list/lookup queries fast as data grows."""
+    try:
+        videos.create_index([("userId", 1), ("createdAt", -1)])
+        clips.create_index("videoId")
+    except Exception as e:  # noqa: BLE001
+        print(f"[storage] index setup skipped: {e}")
