@@ -132,3 +132,8 @@ def transcribe(audio_path: str) -> dict:
             result["words"].extend(part["words"])
             result["segments"].extend(part["segments"])
         result["text"] = result["text"].strip()
+
+    # Guarantee usable word timings for captions.
+    if not result["words"] and result["segments"]:
+        result["words"] = _words_from_segments(result["segments"])
+    return result
