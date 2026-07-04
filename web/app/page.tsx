@@ -39,3 +39,21 @@ export default function Home() {
     setReady(true);
     if (id) syncUser(id);
   }, []);
+
+  // Refresh quota after each upload.
+  useEffect(() => {
+    if (me) loadUsage(me);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshKey]);
+
+  if (!ready) return null;
+  if (!me)
+    return (
+      <SignIn
+        onSignIn={() => {
+          const id = getIdentity();
+          setMe(id);
+          if (id) syncUser(id);
+        }}
+      />
+    );
