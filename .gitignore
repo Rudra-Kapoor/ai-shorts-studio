@@ -18,3 +18,20 @@ web/next-env.d.ts
 .env.local
 .env*.local
 *.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Worker scratch / media
+worker/tmp/
+worker/*.mp4
+worker/*.mp3
+worker/*.wav
+worker/*.ass
