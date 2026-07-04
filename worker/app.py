@@ -49,3 +49,22 @@ def _drain():
     finally:
         with _lock:
             _draining = False
+
+
+@app.get("/")
+def root():
+    return {"service": "ai-shorts-worker", "status": "awake", "draining": _draining}
+
+
+@app.get("/health")
+def health():
+    return {"ok": True}
+
+
+@app.post("/wake", status_code=202)
+def wake(x_worker_secret: str = Header(default="")):
+    _check_secret(x_worker_secret)
+    # Kick off draining in the background and return immediately so the
+    # web app's fire-and-forget ping doesn't block.
+    threading.Thread(target=_drain, daemon=True).start()
+    return {"accepted": True, "draining": True}
