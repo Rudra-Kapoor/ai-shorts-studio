@@ -17,3 +17,20 @@ export async function GET(
   if (!video) {
     return NextResponse.json({ error: "not found" }, { status: 404 });
   }
+
+  const clips = await db
+    .collection(Collections.clips)
+    .find({ videoId: params.id })
+    .sort({ index: 1 })
+    .toArray();
+
+  // Mint short-lived download URLs so the browser can play private R2 objects.
+  if (video.originalKey) {
+    (video as any).originalUrl = await getDownloadUrl(video.originalKey);
+  }
+  for (const c of clips) {
+    if (c.editedKey) (c as any).editedUrl = await getDownloadUrl(c.editedKey);
+    if (c.thumbnailKey)
+      (c as any).thumbnailUrl = await getDownloadUrl(c.thumbnailKey);
+    if (c.srtKey) (c as any).srtUrl = await getDownloadUrl(c.srtKey);
+  }
