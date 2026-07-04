@@ -27,3 +27,19 @@ STYLES = {
                     bold=-1, outline=4, shadow=2, marginv=300,
                     uppercase=False, max_words=4, max_chars=20, fade=(60, 0)),
 }
+
+
+def _header(s, w: int, h: int) -> str:
+    # Scale type/outline/position to the output height so captions look right at
+    # any aspect ratio (9:16 → factor 1.0, the tuned baseline).
+    factor = h / 1920.0
+    size = max(int(s["size"] * factor), 28)
+    outline = max(round(s["outline"] * factor, 1), 2)
+    shadow = round(s["shadow"] * factor, 1)
+    marginv = int(h * 0.18)
+    return f"""[Script Info]
+ScriptType: v4.00+
+PlayResX: {w}
+PlayResY: {h}
+WrapStyle: 2
+ScaledBorderAndShadow: yes
