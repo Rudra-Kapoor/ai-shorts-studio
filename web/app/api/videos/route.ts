@@ -39,3 +39,24 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const ALLOWED_STYLES = ["hormozi", "mrbeast", "minimal", "clean"];
+    const ALLOWED_RATIOS = ["9:16", "1:1", "16:9"];
+    const now = new Date().toISOString();
+    const video = {
+      _id: randomUUID(),
+      userId,
+      title: title || (sourceUrl ? "YouTube video" : "Untitled video"),
+      // An uploaded file already has its R2 key; a link is fetched by the worker,
+      // which fills in originalKey after download.
+      ...(key ? { originalKey: key } : {}),
+      ...(sourceUrl ? { sourceUrl } : {}),
+      sizeBytes: sizeBytes || 0,
+      captionStyle: ALLOWED_STYLES.includes(captionStyle) ? captionStyle : "hormozi",
+      aspectRatio: ALLOWED_RATIOS.includes(aspectRatio) ? aspectRatio : "9:16",
+      status: "queued" as const,
+      stage: sourceUrl ? "Queued — will fetch from link" : "Queued — waiting for a worker",
+      progress: 0,
+      createdAt: now,
+      updatedAt: now,
+    };
