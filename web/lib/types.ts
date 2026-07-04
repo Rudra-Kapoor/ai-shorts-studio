@@ -46,3 +46,23 @@ export interface Clip {
   status: "pending" | "rendering" | "done" | "failed";
   createdAt: string;
 }
+
+export interface Video {
+  _id: string;
+  userId: string;
+  title: string;
+  originalKey?: string; // set after upload, or after a link is fetched
+  sourceUrl?: string; // YouTube/other link, when ingested from a URL
+  originalUrl?: string; // presigned GET url, filled in at read time
+  sizeBytes: number;
+  durationSec?: number;
+  status: VideoStatus;
+  stage?: string; // human-readable current step
+  progress?: number; // 0..100
+  error?: string;
+  transcript?: string;
+  captionStyle?: string; // Phase 2: chosen at upload
+  aspectRatio?: string; // "9:16" | "1:1" | "16:9", chosen at upload
+  createdAt: string;
+  updatedAt: string;
+}
