@@ -123,3 +123,29 @@ That's it. Open the Vercel URL, sign in with any email, upload a video.
    and a **Download** button.
 
 ---
+
+## Honest limits (free tier)
+
+- **Single-user / demo scale.** Free Groq/Gemini rate limits are fine for one
+  video at a time, not a public SaaS. Add per-user caps before sharing widely.
+- **Cold starts.** The worker sleeps when idle and takes ~30–60s to wake.
+- **Video length.** Long videos are auto-chunked for transcription, but each
+  job still runs on one small CPU — very long inputs are slow on the free tier.
+- **Trends are not live.** No free legal trend API exists, so trends are seeded
+  manually (`POST /seed-trends`) and matched with embeddings.
+
+---
+
+## What's built
+
+- **Phase 1:** upload → transcribe → pick viral clips → 9:16 + captions →
+  caption/hashtags → download. ✅
+- **Phase 2:** ✅ caption styles (Hormozi / MrBeast / Clean / Minimal),
+  per-clip thumbnails, optional Gemini-vision keyframe scoring (`VISION_SCORING=1`).
+- **Phase 3:** ✅ face-aware smart crop (opt-in, `FACE_CROP=1` + opencv),
+  trend RAG (Gemini embeddings + Mongo, no heavy vector DB), long-video audio
+  chunking, auto-post to YouTube/Instagram (opt-in, your OAuth creds).
+- **App essentials:** ✅ multi-aspect-ratio output (9:16 / 1:1 / 16:9), per-clip
+  `.srt` caption export, user accounts + per-day quota (`MAX_VIDEOS_PER_DAY`),
+  delete a video (clips + storage cleaned up), upload size guard, resilient API
+  retries, and per-clip fault isolation.
