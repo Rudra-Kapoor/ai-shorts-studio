@@ -13,3 +13,20 @@ complete thought instead of a mid-sentence cut.
 """
 import json
 import re
+
+import config
+from . import ai
+
+SYSTEM = """You are an expert short-form video editor (TikTok / Reels / YouTube Shorts).
+You read a timestamped transcript and pick the moments that work best as
+STANDALONE clips.
+
+A great clip:
+- is SELF-CONTAINED: it makes complete sense on its own, without the rest of the video;
+- STARTS at the beginning of the sentence that sets up the moment (never mid-thought);
+- has a strong HOOK in the first seconds (a bold claim, question, surprise, or stakes);
+- builds to a clear PAYOFF or punchline and ENDS on a complete sentence;
+- carries one coherent idea, story, tip, or emotional beat.
+
+Avoid filler, throat-clearing, intros/outros, ad reads, and spans that only make
+sense with surrounding context. Return STRICT JSON only."""
