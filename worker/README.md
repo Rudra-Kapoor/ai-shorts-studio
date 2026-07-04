@@ -13,3 +13,21 @@ POST /wake  →  drain queue (Upstash)  →  for each job:
    → per clip: ASS captions → FFmpeg 9:16 render → upload (R2) → Gemini caption
    → write status/clips (MongoDB)
 ```
+
+## Endpoints
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/` | liveness + whether it's currently draining |
+| GET | `/health` | health check (used by Render) |
+| POST | `/wake` | wakes the instance and drains the job queue (needs `x-worker-secret`) |
+
+## Run locally with Docker (optional)
+
+> You don't need to — the cloud build does this for you. But if you want to test:
+
+```bash
+docker build -t ass-worker ./worker
+docker run --rm -p 8000:8000 --env-file .env ass-worker
+# then: curl -X POST localhost:8000/wake -H "x-worker-secret: <yours>"
+```
