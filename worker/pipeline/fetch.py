@@ -52,3 +52,10 @@ def download_youtube(url: str, out_path: str) -> dict:
         if not cands:
             raise RuntimeError("yt-dlp produced no output file")
         produced = cands[0]
+
+    if produced != out_path:
+        os.replace(produced, out_path)
+
+    title = info.get("title") if isinstance(info, dict) else None
+    duration = info.get("duration") if isinstance(info, dict) else None
+    return {"title": title, "duration": duration}
