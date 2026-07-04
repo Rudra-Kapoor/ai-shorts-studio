@@ -278,3 +278,10 @@ def snap_to_sentences(clips, segments):
             cc["start"], cc["end"] = ns, ne
         out.append(cc)
     return out
+
+
+def _score(v):
+    try:
+        return max(0, min(100, int(round(float(v)))))
+    except (TypeError, ValueError):
+        return 50
