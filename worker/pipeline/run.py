@@ -186,3 +186,28 @@ def process_job(video_id: str, user_id: str) -> None:
         if not tr["segments"]:
             storage.update_video(video_id, status="done", stage="No speech detected", progress=100)
             return
+
+        storage.update_video(video_id, transcript=tr["text"][:20000],
+                             stage="Finding viral moments", progress=35)
+
+        # Detection + Judge Agent, then snap to whole sentences for context
+        found = score.find_clips(tr["segments"], duration)
+        found = score.snap_to_sentences(found, tr["segments"])
+        if not found:
+            storage.update_video(video_id, status="done", stage="No strong clips found", progress=100)
+            return
+
+        total = len(found)
+        # Fetch trends once per job (not once per clip).
+        seeded_trends = storage.all_trends() if config.GEMINI_API_KEY else []
+        succeeded = 0
+        for i, c in enumerate(found):
+            storage.update_video(video_id, stage=f"Editing clip {i + 1} of {total}",
+                                 progress=40 + int((i / total) * 55))
+            try:
+                _process_clip(video_id, user_id, src, tr, c, i, style, tmp, media,
+                              seeded_trends, out_w, out_h, ratio)
+                succeeded += 1
+            except Exception as e:  # noqa: BLE001 — isolate per-clip failures
+                traceback.print_exc()
+                print(f"[run] clip {i} failed: {_err_detail(e)}")
