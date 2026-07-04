@@ -16,3 +16,23 @@ const globalWithMongo = global as typeof globalThis & {
   _mongoClient?: MongoClient;
   _mongoPromise?: Promise<MongoClient>;
 };
+
+export async function getDb(): Promise<Db> {
+  if (!uri) throw new Error("MONGODB_URI is not configured");
+
+  if (!globalWithMongo._mongoPromise) {
+    const client = new MongoClient(uri, {
+      maxPoolSize: 5,
+    });
+    globalWithMongo._mongoClient = client;
+    globalWithMongo._mongoPromise = client.connect();
+  }
+  const client = await globalWithMongo._mongoPromise;
+  return client.db(dbName);
+}
+
+export const Collections = {
+  videos: "videos",
+  clips: "clips",
+  users: "users",
+} as const;
