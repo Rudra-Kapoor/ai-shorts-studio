@@ -85,3 +85,22 @@ export default function ClipCard({ clip }: { clip: Clip }) {
             <span className="badge bg-edge text-gray-300">{clip.captionStyle}</span>
           )}
         </div>
+
+        {clip.trendMatch && clip.trendMatch.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {clip.trendMatch.map((t) => (
+              <span key={t} className="badge bg-brand2/15 text-brand2">
+                📈 {t}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="space-y-1.5">
+          <Score label="Hook" value={clip.scores?.hook ?? 0} />
+          <Score label="Emotion" value={clip.scores?.emotion ?? 0} />
+          <Score label="Energy" value={clip.scores?.energy ?? 0} />
+          {clip.scores?.visual ? (
+            <Score label="Visual" value={clip.scores?.visual ?? 0} />
+          ) : null}
+        </div>
