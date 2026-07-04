@@ -49,3 +49,39 @@ export default function VideoList({
       </div>
     );
   }
+
+  return (
+    <div className="mt-6 grid gap-3">
+      {videos.map((v) => (
+        <div
+          key={v._id}
+          className="card flex items-center justify-between p-4 hover:border-brand"
+        >
+          <Link
+            href={`/video/${v._id}`}
+            className="flex min-w-0 flex-1 items-center justify-between gap-3"
+          >
+            <div className="min-w-0">
+              <div className="truncate font-medium">{v.title}</div>
+              <div className="mt-1 text-xs text-gray-400">
+                {v.stage || "—"}
+                {typeof v.progress === "number" && v.status === "processing"
+                  ? ` · ${v.progress}%`
+                  : ""}
+              </div>
+            </div>
+            <StatusBadge status={v.status} />
+          </Link>
+          <button
+            onClick={() => del(v._id)}
+            className="ml-3 rounded-lg px-2 py-1 text-gray-500 transition hover:bg-red-500/10 hover:text-red-400"
+            title="Delete video"
+            aria-label="Delete video"
+          >
+            🗑
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
