@@ -14,3 +14,19 @@ PROMPT = (
     "engagement for social media from 0-100 (faces, motion, expression, color, "
     "visual interest). Return STRICT JSON: {\"visual\": <0-100>}."
 )
+
+
+def score_visual(frame_paths) -> "int | None":
+    if not config.GEMINI_API_KEY or not frame_paths:
+        return None
+
+    parts = [{"text": PROMPT}]
+    for p in frame_paths[:3]:
+        try:
+            with open(p, "rb") as f:
+                b64 = base64.b64encode(f.read()).decode("ascii")
+            parts.append({"inline_data": {"mime_type": "image/jpeg", "data": b64}})
+        except OSError:
+            continue
+    if len(parts) == 1:
+        return None
