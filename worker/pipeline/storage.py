@@ -66,3 +66,21 @@ def get_video(video_id: str):
 def update_video(video_id: str, **fields) -> None:
     fields["updatedAt"] = datetime.now(timezone.utc).isoformat()
     videos.update_one({"_id": video_id}, {"$set": fields})
+
+
+def upsert_clip(clip: dict) -> None:
+    clips.update_one({"_id": clip["_id"]}, {"$set": clip}, upsert=True)
+
+
+def get_clip(clip_id: str):
+    return clips.find_one({"_id": clip_id})
+
+
+def update_clip(clip_id: str, fields: dict) -> None:
+    clips.update_one({"_id": clip_id}, {"$set": fields})
+
+
+def delete_clips(video_id: str) -> int:
+    """Remove a video's existing clips — so reprocessing/retry doesn't pile up
+    duplicates."""
+    return clips.delete_many({"videoId": video_id}).deleted_count
