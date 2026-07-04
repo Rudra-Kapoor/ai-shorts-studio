@@ -13,3 +13,19 @@ caption + hashtags for each clip.
 ---
 
 ## What it does (the pipeline)
+
+```
+Upload ──► [Web · Vercel] ──► queue (Upstash) ──► wake ──► [Worker · Render]
+                 │                                              │
+              MongoDB                                           ├─ Whisper (Groq)      → transcript + word timings
+                 ▲                                              ├─ Llama (Groq)        → score & pick viral clips
+                 │                                              ├─ FFmpeg              → 9:16 crop + burn captions
+                 └───────────── status / clips ────────────────┤─ Gemini Flash        → caption + hashtags
+                                                                └─ R2                  → store finished Shorts
+```
+
+The single most important design choice: **one batched LLM call scores the whole
+transcript** and returns the best clips. That's what keeps everything inside free
+rate limits.
+
+---
