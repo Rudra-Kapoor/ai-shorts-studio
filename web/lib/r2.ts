@@ -52,3 +52,15 @@ export async function getDownloadUrl(key: string, expiresIn = 60 * 60) {
   const cmd = new GetObjectCommand({ Bucket: R2_BUCKET, Key: key });
   return getSignedUrl(client(), cmd, { expiresIn });
 }
+
+/** Delete a batch of objects (used when a user deletes a video). */
+export async function deleteObjects(keys: string[]) {
+  const clean = keys.filter(Boolean);
+  if (clean.length === 0) return;
+  await client().send(
+    new DeleteObjectsCommand({
+      Bucket: R2_BUCKET,
+      Delete: { Objects: clean.map((Key) => ({ Key })) },
+    })
+  );
+}
