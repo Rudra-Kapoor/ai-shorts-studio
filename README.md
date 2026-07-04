@@ -29,3 +29,25 @@ transcript** and returns the best clips. That's what keeps everything inside fre
 rate limits.
 
 ---
+
+## The free stack (every piece has a free tier)
+
+| Layer | Service | What to create | Free? |
+|---|---|---|---|
+| Web UI + API | **Vercel** | import the `web/` folder | ✅ always-on |
+| Database | **MongoDB Atlas** | free M0 cluster + DB user | ✅ 512MB |
+| Object storage | **Cloudflare R2** | a bucket + S3 API token | ✅ 10GB |
+| Job queue | **Upstash Redis** | a database (REST) | ✅ serverless |
+| Worker | **Render** | Docker web service (`render.yaml`) | ✅ wakes-on-request |
+| Transcription + LLM | **Groq** | API key | ✅ free |
+| Captions/vision | **Google Gemini** | API key (AI Studio) | ✅ free |
+
+Repo layout:
+
+```
+ai-shorts-studio/
+├── web/        Next.js app  → deploy to Vercel
+├── worker/     FastAPI + FFmpeg pipeline → deploy to Render (Docker)
+├── render.yaml Render blueprint for the worker
+└── .env.example  every secret, annotated
+```
