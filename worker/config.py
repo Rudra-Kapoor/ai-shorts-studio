@@ -75,3 +75,19 @@ CAPTION_STYLE = os.getenv("CAPTION_STYLE", "hormozi")
 THUMBNAILS = os.getenv("THUMBNAILS", "1") == "1"
 # Gemini-vision keyframe scoring (off by default — costs extra API calls).
 VISION_SCORING = os.getenv("VISION_SCORING", "0") == "1"
+
+# Fonts baked into the Docker image (used by ASS captions + thumbnail text).
+FONT_NAME = os.getenv("FONT_NAME", "Liberation Sans")
+FONT_FILE = os.getenv(
+    "FONT_FILE", "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"
+)
+
+# --- Phase 3 ---
+# Face-aware smart crop (needs opencv-python-headless installed; off by default
+# so the lean free-tier image still works — falls back to center crop).
+FACE_CROP = os.getenv("FACE_CROP", "0") == "1"
+# Long-video transcription: chunk the audio when it exceeds the Whisper limit.
+WHISPER_MAX_MB = _int("WHISPER_MAX_MB", 24)
+CHUNK_SEC = _int("CHUNK_SEC", 600)
+# Trend RAG (Gemini embeddings + Mongo). Disabled automatically if no key/seed.
+GEMINI_EMBED_MODEL = os.getenv("GEMINI_EMBED_MODEL", "text-embedding-004")
