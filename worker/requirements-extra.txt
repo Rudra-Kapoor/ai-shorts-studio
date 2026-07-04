@@ -1,0 +1,8 @@
+# OPTIONAL extras — only needed for the heavy Phase 3 "face-aware smart crop".
+# Kept out of the default requirements.txt so the lean free-tier image (512MB)
+# stays small and reliable. To enable face crop:
+#   1) add the line below into requirements.txt (or install it in the Dockerfile)
+#   2) set FACE_CROP=1 in the worker env
+# If it's not installed, the worker silently falls back to a centered crop.
+
+opencv-python-headless==4.10.0.84
