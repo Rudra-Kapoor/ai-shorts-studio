@@ -153,3 +153,19 @@ def _obtain_source(video, video_id, user_id, src) -> None:
     if title and video.get("title") in (None, "", "YouTube video", "Untitled video"):
         fields["title"] = title[:200]
     storage.update_video(video_id, **fields)
+
+
+def process_job(video_id: str, user_id: str) -> None:
+    video = storage.get_video(video_id)
+    if not video:
+        print(f"[run] video {video_id} not found, skipping")
+        return
+
+    style = video.get("captionStyle") or config.CAPTION_STYLE
+    ratio = video.get("aspectRatio") or config.DEFAULT_RATIO
+    out_w, out_h = config.dims_for(ratio)
+    tmp = tempfile.mkdtemp(prefix="ass_")
+    try:
+        storage.update_video(video_id, status="processing", stage="Downloading video", progress=5)
+        src = os.path.join(tmp, "source.mp4")
+        _obtain_source(video, video_id, user_id, src)
