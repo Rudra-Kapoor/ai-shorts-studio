@@ -66,3 +66,22 @@ export interface Video {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface VideoWithClips extends Video {
+  clips: Clip[];
+}
+
+export interface Usage {
+  used: number;
+  limit: number;
+  remaining: number;
+}
+
+export interface User {
+  _id: string;
+  email: string;
+  name?: string;
+  subscription: "free" | "pro";
+  totalVideos?: number;
+  createdAt: string;
+}
