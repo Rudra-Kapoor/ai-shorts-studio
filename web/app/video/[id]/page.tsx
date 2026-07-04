@@ -113,3 +113,28 @@ export default function VideoPage() {
           </p>
         </div>
       )}
+
+      {data.status === "failed" && (
+        <div className="card mt-4 border-red-500/40 p-5">
+          <p className="text-sm text-red-300">
+            Processing failed: {data.error || "unknown error"}
+          </p>
+          <button className="btn-ghost mt-3" onClick={retry}>
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* Original preview */}
+      {data.originalUrl && (
+        <details className="card mt-4 p-4">
+          <summary className="cursor-pointer text-sm text-gray-300">
+            Original video
+          </summary>
+          <video
+            src={data.originalUrl}
+            controls
+            className="mt-3 max-h-80 w-full rounded-lg bg-black"
+          />
+        </details>
+      )}
