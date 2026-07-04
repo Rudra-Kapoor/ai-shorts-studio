@@ -111,3 +111,20 @@ git push -u origin main
 1. https://vercel.com → **Add New → Project** → import the same repo.
 2. **IMPORTANT: set _Root Directory_ to `web`.**
 3. Add these Environment Variables:
+
+| Key | Value |
+|---|---|
+| `MONGODB_URI` | same as Render |
+| `MONGODB_DB` | `ai_shorts` |
+| `R2_ACCOUNT_ID` | from step 1 |
+| `R2_ACCESS_KEY_ID` | from step 1 |
+| `R2_SECRET_ACCESS_KEY` | from step 1 |
+| `R2_BUCKET` | `ai-shorts` |
+| `UPSTASH_REDIS_REST_URL` | from step 3 |
+| `UPSTASH_REDIS_REST_TOKEN` | from step 3 |
+| `WORKER_URL` | your Render URL from step 7 |
+| `WORKER_SECRET` | the **same** secret from step 6 |
+
+4. **Deploy.** Open your Vercel URL. 🎉
+
+---
