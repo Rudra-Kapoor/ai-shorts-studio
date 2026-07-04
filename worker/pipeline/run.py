@@ -69,3 +69,20 @@ def _process_clip(video_id, user_id, src, tr, c, i, style, tmp, dims, seeded_tre
     clip_id = uuid.uuid4().hex
     ass_path = os.path.join(tmp, f"{clip_id}.ass")
     out_path = os.path.join(tmp, f"{clip_id}.mp4")
+
+    # Sample frames once if any vision/face feature is on (reused below).
+    frames = []
+    if config.VISION_SCORING or config.FACE_CROP:
+        frames = edit.extract_frames(src, c["start"], c["end"], 3, tmp, prefix=clip_id)
+
+    visual = vision.score_visual(frames) if config.VISION_SCORING else None
+    virality = _blend_virality(c["virality"], visual)
+    crop_frac = smartcrop.face_center_frac(frames) if config.FACE_CROP else None
+
+    subtitles.build_ass(tr["words"], c["start"], c["end"], ass_path, style=style,
+                        width=out_w, height=out_h)
+    edit.render_clip(src, c["start"], c["end"], ass_path, out_path,
+                     crop_frac=crop_frac, dims=dims, out_w=out_w, out_h=out_h)
+
+    key = f"clips/{user_id}/{video_id}/{clip_id}.mp4"
+    storage.upload_file(out_path, key, content_type="video/mp4")
