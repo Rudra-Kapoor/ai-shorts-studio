@@ -104,3 +104,19 @@ def build_ass(words, clip_start: float, clip_end: float, out_path: str,
         events.append(
             f"Dialogue: 0,{_ass_time(start)},{_ass_time(end)},Cap,,0,0,0,,{body}"
         )
+
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write(_header(s, w, h))
+        f.write("\n".join(events))
+        f.write("\n")
+    return out_path
+
+
+def _srt_time(t: float) -> str:
+    if t < 0:
+        t = 0.0
+    ms = int(round(t * 1000))
+    h, ms = divmod(ms, 3_600_000)
+    m, ms = divmod(ms, 60_000)
+    s, ms = divmod(ms, 1000)
+    return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
