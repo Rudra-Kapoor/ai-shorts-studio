@@ -89,3 +89,19 @@ def render_clip(src_video: str, start: float, end: float, ass_path: str,
     # the video), then an accurate output-seek for the remainder.
     fast = max(0.0, start - SEEK_PAD)
     rem = start - fast
+
+    # setpts/asetpts force the post-seek streams to start at t=0 so the 0-based
+    # ASS captions line up exactly with the audio, regardless of seek behavior.
+    vf = (
+        f"setpts=PTS-STARTPTS,"
+        f"scale={W}:{H}:force_original_aspect_ratio=increase,"
+        f"{_crop_filter(crop_frac, dims, W, H)},"
+        f"ass={ass_name}"
+    )
+
+    # Explicitly map the first video + first audio stream. Real-world sources
+    # (esp. YouTube) can have multiple/odd streams, variable frame rate, edit
+    # lists, or async audio — without explicit mapping + aresample the clip can
+    # come out silent or out of sync. `0:a:0?` makes audio optional so a
+    # silent source still renders instead of failing.
+    has_audio = True if dims is None else bool(dims.get("has_audio", True))
