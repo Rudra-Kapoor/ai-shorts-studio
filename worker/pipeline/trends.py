@@ -47,3 +47,23 @@ DEFAULT_TRENDS = [
      "style": "minimal",
      "hashtags": ["howto", "tutorial", "tips"]},
 ]
+
+
+def embed(text: str):
+    """Gemini embedding for a piece of text. Returns a vector or None."""
+    if not config.GEMINI_API_KEY or not text.strip():
+        return None
+    url = (
+        f"https://generativelanguage.googleapis.com/v1beta/models/"
+        f"{config.GEMINI_EMBED_MODEL}:embedContent?key={config.GEMINI_API_KEY}"
+    )
+    body = {
+        "model": f"models/{config.GEMINI_EMBED_MODEL}",
+        "content": {"parts": [{"text": text[:8000]}]},
+    }
+    try:
+        r = ai.post_with_retry(url, json=body, timeout=30)
+        return r.json()["embedding"]["values"]
+    except Exception as e:  # noqa: BLE001
+        print(f"[trends] embed failed: {e}")
+        return None
