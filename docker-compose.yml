@@ -26,3 +26,19 @@ services:
       interval: 5s
       timeout: 5s
       retries: 30
+
+  # S3-compatible object storage standing in for Cloudflare R2.
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: localminio
+      MINIO_ROOT_PASSWORD: localminio123
+      # Let the browser PUT/GET directly via presigned URLs.
+      MINIO_API_CORS_ALLOW_ORIGIN: "*"
+    ports:
+      - "9000:9000"   # S3 API (browser + web + worker)
+      - "9001:9001"   # MinIO web console (http://localhost:9001)
+    volumes:
+      - minio_data:/data
