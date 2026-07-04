@@ -148,3 +148,38 @@ export default function ClipCard({ clip }: { clip: Clip }) {
             </button>
           )}
         </div>
+
+        {/* Auto-post (Phase 3) — needs your OAuth env vars on the worker */}
+        {clip.editedUrl && (
+          <div className="flex flex-wrap items-center gap-2 border-t border-edge pt-3">
+            <button
+              className="btn-ghost text-xs"
+              disabled={posting !== null}
+              onClick={() => publish("youtube")}
+            >
+              {posting === "youtube" ? "Posting…" : "▶ YouTube"}
+            </button>
+            <button
+              className="btn-ghost text-xs"
+              disabled={posting !== null}
+              onClick={() => publish("instagram")}
+            >
+              {posting === "instagram" ? "Posting…" : "◎ Instagram"}
+            </button>
+            {clip.youtubeUrl && (
+              <a className="text-xs text-emerald-300" href={clip.youtubeUrl} target="_blank">
+                YT ✓
+              </a>
+            )}
+            {clip.instagramUrl && (
+              <a className="text-xs text-brand2" href={clip.instagramUrl} target="_blank">
+                IG ✓
+              </a>
+            )}
+          </div>
+        )}
+        {msg && <p className="break-all text-xs text-gray-400">{msg}</p>}
+      </div>
+    </div>
+  );
+}
