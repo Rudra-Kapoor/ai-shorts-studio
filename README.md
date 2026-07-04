@@ -85,3 +85,25 @@ Take it slow; it's all copy-paste.
 
 ### 5. Google Gemini (captions)
 1. https://aistudio.google.com/app/apikey → create a key (`AIza…`).
+
+### 6. Pick a WORKER_SECRET
+Any long random string. The web app sends it to the worker so only you can
+trigger jobs. Use the same value in both Vercel and Render.
+
+---
+
+## Deploy
+
+### Worker → Render
+1. Push this repo to GitHub.
+2. Render → **New → Blueprint** → select the repo (it reads `render.yaml`).
+3. Fill in the secret env vars (everything marked `sync:false`).
+4. Deploy. Copy the service URL, e.g. `https://ai-shorts-worker.onrender.com`.
+
+### Web → Vercel
+1. Vercel → **Add New → Project** → import the repo.
+2. **Set Root Directory to `web`.**
+3. Add the env vars from `web/.env.example`, including:
+   - `WORKER_URL` = your Render URL
+   - `WORKER_SECRET` = the same secret you gave Render
+4. Deploy.
