@@ -31,3 +31,31 @@ def _yt_access_token() -> str:
     )
     r.raise_for_status()
     return r.json()["access_token"]
+
+
+def publish_youtube(file_path: str, title: str, description: str, tags: list) -> dict:
+    if not (config.YT_CLIENT_ID and config.YT_CLIENT_SECRET and config.YT_REFRESH_TOKEN):
+        return {"ok": False, "error": "YouTube not configured (set YT_CLIENT_ID/SECRET/REFRESH_TOKEN)"}
+
+    token = _yt_access_token()
+    metadata = {
+        "snippet": {"title": title[:95] or "Short", "description": description[:4900],
+                    "tags": tags[:15], "categoryId": "22"},
+        "status": {"privacyStatus": "private", "selfDeclaredMadeForKids": False},
+    }
+    size = os.path.getsize(file_path)
+
+    # 1) start a resumable session
+    start = requests.post(
+        "https://www.googleapis.com/upload/youtube/v3/videos"
+        "?uploadType=resumable&part=snippet,status",
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json; charset=UTF-8",
+            "X-Upload-Content-Type": "video/mp4",
+            "X-Upload-Content-Length": str(size),
+        },
+        json=metadata, timeout=30,
+    )
+    start.raise_for_status()
+    upload_url = start.headers["Location"]
