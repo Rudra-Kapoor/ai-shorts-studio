@@ -167,3 +167,26 @@ put it all on one line.)* You should get `{"ok":true,"seeded":5}`.
 | **Face-aware smart crop** | add `opencv-python-headless==4.10.0.84` to `worker/requirements.txt`, set `FACE_CROP=1` |
 | **Auto-post to YouTube** | set `YT_CLIENT_ID`, `YT_CLIENT_SECRET`, `YT_REFRESH_TOKEN` (see below) |
 | **Auto-post to Instagram** | set `IG_USER_ID`, `IG_ACCESS_TOKEN` (Business/Creator account) |
+
+### YouTube auto-post setup (if you want it)
+1. Google Cloud Console → enable **YouTube Data API v3**.
+2. Create an **OAuth client (Desktop app)** → 📋 client id + secret.
+3. Generate a **refresh token** once (OAuth Playground at
+   `developers.google.com/oauthplayground`, scope
+   `https://www.googleapis.com/auth/youtube.upload`, use your own client id/secret).
+4. Put all three into Render env. Videos upload as **private** by default — flip to
+   public in YouTube Studio when you're happy.
+
+---
+
+## 🆘 Troubleshooting first deploy
+
+| Symptom | Fix |
+|---|---|
+| Upload fails instantly in the browser | R2 **CORS** not set (step 1.4). |
+| Video stuck on "Queued" forever | `WORKER_URL`/`WORKER_SECRET` mismatch between Vercel & Render, or worker still cold — wait 60s. |
+| Worker `/health` 404 or won't build | Check Render build logs; ensure Root/Docker came from `render.yaml`. |
+| "GROQ_API_KEY is not set" in logs | Key missing/typo'd in Render env. |
+| Captions look blank | Make sure you deployed the latest Dockerfile (it installs fonts). Redeploy. |
+| Mongo connection error | `0.0.0.0/0` not added in Atlas Network Access (step 2.3). |
+| `failed` status on a video | Open the video page → **Retry**. Check Render logs for the real error. |
