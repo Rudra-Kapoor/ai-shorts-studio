@@ -30,3 +30,20 @@ A great clip:
 
 Avoid filler, throat-clearing, intros/outros, ad reads, and spans that only make
 sense with surrounding context. Return STRICT JSON only."""
+
+CHAR_BUDGET = 14000   # ~ how much transcript fits comfortably in one prompt
+MAX_WINDOWS = 8       # cap LLM calls on very long videos
+
+
+def _seg_line(s) -> str:
+    return f"[{s['start']:.1f}-{s['end']:.1f}] {s['text']}"
+
+
+def _prompt(seg_lines, duration, min_s, max_s, n) -> str:
+    transcript = "\n".join(seg_lines)
+    return f"""Video duration: {duration:.0f}s.
+
+From the transcript below, select the best standalone clips — aim for {n}, but
+skip filler (intros, sign-offs, "where was I", ad reads). Don't stop at one clip
+if several strong, separate moments exist. ALWAYS return at least one clip — the
+single best moment — even if the video is fairly ordinary; never return an empty list.
