@@ -47,3 +47,31 @@ From the transcript below, select the best standalone clips — aim for {n}, but
 skip filler (intros, sign-offs, "where was I", ad reads). Don't stop at one clip
 if several strong, separate moments exist. ALWAYS return at least one clip — the
 single best moment — even if the video is fairly ordinary; never return an empty list.
+
+Each clip must:
+- be between {min_s} and {max_s} seconds long. COMBINE several CONSECUTIVE
+  sentences so the clip reaches at least {min_s} seconds — never return a single
+  short sentence,
+- start and end on REAL sentence timestamps from the transcript (use the
+  [start-end] numbers shown: start at a sentence's start, end at a later
+  sentence's end),
+- contain the COMPLETE moment — the setup AND its payoff / resolution / punchline.
+  Do NOT end before the conclusion (e.g. don't stop on the cliffhanger and cut
+  the result),
+- be self-contained and not overlap another pick.
+
+Return STRICT JSON of this exact shape:
+{{
+  "clips": [
+    {{
+      "start": <seconds, number — a sentence start from the transcript>,
+      "end": <seconds, number — a sentence end from the transcript>,
+      "title": "<punchy 3-6 word title>",
+      "hook": <0-100>,
+      "emotion": <0-100>,
+      "energy": <0-100>,
+      "virality": <0-100 overall>,
+      "reason": "<one sentence: why this stands alone and pops>"
+    }}
+  ]
+}}
