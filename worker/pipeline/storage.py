@@ -30,3 +30,22 @@ _s3 = boto3.client(
 
 def download_file(key: str, dest_path: str) -> None:
     _s3.download_file(config.R2_BUCKET, key, dest_path)
+
+
+def upload_file(local_path: str, key: str, content_type: str = "video/mp4") -> str:
+    _s3.upload_file(
+        local_path,
+        config.R2_BUCKET,
+        key,
+        ExtraArgs={"ContentType": content_type},
+    )
+    return key
+
+
+def presigned_get(key: str, expires: int = 3600) -> str:
+    """A short-lived public GET url (used so Instagram can pull a private clip)."""
+    return _s3.generate_presigned_url(
+        "get_object",
+        Params={"Bucket": config.R2_BUCKET, "Key": key},
+        ExpiresIn=expires,
+    )
