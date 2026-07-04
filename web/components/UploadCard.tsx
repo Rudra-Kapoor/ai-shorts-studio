@@ -193,3 +193,23 @@ export default function UploadCard({
             ))}
           </div>
         </div>
+
+        <div>
+          <label className="mb-1 block text-xs text-gray-400">Aspect ratio</label>
+          <div className="grid grid-cols-3 gap-2">
+            {RATIOS.map((rr) => (
+              <button
+                key={rr.id}
+                type="button"
+                onClick={() => setAspectRatio(rr.id)}
+                className={`rounded-xl border p-2 text-center text-sm transition ${
+                  aspectRatio === rr.id
+                    ? "border-brand bg-brand/10"
+                    : "border-edge hover:border-gray-500"
+                }`}
+              >
+                {rr.label}
+              </button>
+            ))}
+          </div>
+        </div>
