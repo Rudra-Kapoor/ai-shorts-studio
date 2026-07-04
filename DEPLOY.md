@@ -128,3 +128,23 @@ git push -u origin main
 4. **Deploy.** Open your Vercel URL. 🎉
 
 ---
+
+## 9) Seed trends (one time, optional but recommended)
+
+Turns on the Phase-3 trend matching. Run this once (replace the URL + secret):
+
+```bash
+curl -X POST https://ai-shorts-worker.onrender.com/seed-trends ^
+  -H "x-worker-secret: YOUR_WORKER_SECRET"
+```
+*(Windows CMD uses `^` for line breaks; PowerShell uses a backtick `` ` ``. Or just
+put it all on one line.)* You should get `{"ok":true,"seeded":5}`.
+
+---
+
+## 10) Use it
+
+1. Open the Vercel URL → sign in with any email.
+2. Pick a **caption style**, choose a short video, **Upload & generate Shorts**.
+3. First job: the worker cold-starts (~30–60s). The page shows live progress.
+4. Finished Shorts appear with thumbnails, scores, captions, hashtags, Download.
