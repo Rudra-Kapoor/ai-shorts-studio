@@ -13,3 +13,31 @@ body {
   color: #e7e7ee;
   min-height: 100%;
 }
+
+* {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Component classes live in @layer so Tailwind resolves them correctly.
+   Button variants are self-contained (we don't @apply the custom .btn class,
+   which Tailwind can't resolve from inside another @apply). */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 font-medium transition;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 font-medium transition bg-brand text-white hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 font-medium transition border border-edge text-gray-200 hover:bg-panel;
+  }
+  .card {
+    @apply rounded-2xl border border-edge bg-panel/70 backdrop-blur;
+  }
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  .input {
+    @apply w-full rounded-xl border border-edge bg-ink px-3 py-2 text-sm outline-none focus:border-brand;
+  }
+}
