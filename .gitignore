@@ -35,3 +35,8 @@ worker/*.mp4
 worker/*.mp3
 worker/*.wav
 worker/*.ass
+
+# Editor
+.vscode/
+.idea/
+.claude/
