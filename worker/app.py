@@ -68,3 +68,23 @@ def wake(x_worker_secret: str = Header(default="")):
     # web app's fire-and-forget ping doesn't block.
     threading.Thread(target=_drain, daemon=True).start()
     return {"accepted": True, "draining": True}
+
+
+class PublishBody(BaseModel):
+    clipId: str
+    platform: str  # "youtube" | "instagram"
+
+
+@app.post("/publish")
+def publish_endpoint(body: PublishBody, x_worker_secret: str = Header(default="")):
+    """Post a finished clip to YouTube/Instagram (needs your OAuth env vars)."""
+    _check_secret(x_worker_secret)
+    return publish.publish_clip(body.clipId, body.platform)
+
+
+@app.post("/seed-trends")
+def seed_trends_endpoint(x_worker_secret: str = Header(default="")):
+    """One-time: embed + store the default trend set. Safe to call repeatedly."""
+    _check_secret(x_worker_secret)
+    count = trends.seed_default_trends()
+    return {"ok": True, "seeded": count}
