@@ -112,3 +112,23 @@ def _split_audio(audio_path: str, out_dir: str, chunk_sec: int) -> list:
         check=True, capture_output=True,
     )
     return sorted(glob.glob(os.path.join(out_dir, "chunk_*.mp3")))
+
+
+def transcribe(audio_path: str) -> dict:
+    if not config.GROQ_API_KEY:
+        raise RuntimeError("GROQ_API_KEY is not set")
+
+    size_mb = os.path.getsize(audio_path) / (1024 * 1024)
+    if size_mb <= config.WHISPER_MAX_MB:
+        result = _transcribe_file(audio_path)
+    else:
+        out_dir = os.path.join(os.path.dirname(audio_path), "chunks")
+        os.makedirs(out_dir, exist_ok=True)
+        chunks = _split_audio(audio_path, out_dir, config.CHUNK_SEC)
+        result = {"text": "", "words": [], "segments": []}
+        for i, chunk in enumerate(chunks):
+            part = _offset(_transcribe_file(chunk), by=i * config.CHUNK_SEC)
+            result["text"] += (" " + part["text"]).strip() + " "
+            result["words"].extend(part["words"])
+            result["segments"].extend(part["segments"])
+        result["text"] = result["text"].strip()
