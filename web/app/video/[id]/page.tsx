@@ -37,3 +37,23 @@ export default function VideoPage() {
     // Stop polling once there's nothing left to update.
     if (j.video?.status === "done" || j.video?.status === "failed") stopPolling();
   }
+
+  useEffect(() => {
+    load();
+    startPolling();
+    return () => stopPolling();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  async function retry() {
+    await fetch(`/api/videos/${id}`, { method: "POST" });
+    startPolling(); // resume live updates after re-queueing
+    load();
+  }
+
+  async function del() {
+    if (!confirm("Delete this video and all its clips? This cannot be undone.")) return;
+    stopPolling();
+    await fetch(`/api/videos/${id}`, { method: "DELETE" }).catch(() => {});
+    router.push("/");
+  }
