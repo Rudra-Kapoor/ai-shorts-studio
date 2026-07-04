@@ -67,3 +67,25 @@ def embed(text: str):
     except Exception as e:  # noqa: BLE001
         print(f"[trends] embed failed: {e}")
         return None
+
+
+def _cosine(a, b) -> float:
+    if not a or not b:
+        return 0.0
+    dot = sum(x * y for x, y in zip(a, b))
+    na = math.sqrt(sum(x * x for x in a))
+    nb = math.sqrt(sum(y * y for y in b))
+    return dot / (na * nb) if na and nb else 0.0
+
+
+def seed_default_trends() -> int:
+    """Embed + upsert the default trend set. Idempotent. Returns count seeded."""
+    n = 0
+    for t in DEFAULT_TRENDS:
+        vec = embed(t["text"])
+        doc = dict(t)
+        if vec:
+            doc["embedding"] = vec
+        storage.upsert_trend(doc)
+        n += 1
+    return n
