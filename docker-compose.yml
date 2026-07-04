@@ -1,0 +1,28 @@
+# Local all-in-one stack for AI Shorts Studio.
+#
+# Brings up everything the app needs on your machine so you don't have to create
+# cloud accounts: MongoDB (DB), MinIO (S3 storage in place of Cloudflare R2),
+# Redis + a serverless-redis-http shim (the Upstash REST API the code expects),
+# and the FFmpeg worker. The Next.js web app runs on the host (`npm run dev`).
+#
+#   docker compose up -d --build      # start everything
+#   docker compose logs -f worker     # watch the pipeline
+#   docker compose down               # stop (add -v to wipe data)
+#
+# Secrets (your Groq/Gemini keys) live in worker/.env.worker.local.
+
+name: ai-shorts-studio
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
