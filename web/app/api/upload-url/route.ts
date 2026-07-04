@@ -22,3 +22,14 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const safe = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const key = `originals/${userId}/${Date.now()}-${safe}`;
+    const uploadUrl = await getUploadUrl(key, contentType);
+
+    return NextResponse.json({ key, uploadUrl });
+  } catch (err: any) {
+    console.error("[upload-url]", err);
+    return NextResponse.json({ error: err.message || "failed" }, { status: 500 });
+  }
+}
