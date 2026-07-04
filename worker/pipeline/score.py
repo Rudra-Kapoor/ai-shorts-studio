@@ -164,3 +164,38 @@ def find_clips(segments, duration: float) -> list:
         print("[score] no usable LLM picks — using speech-density fallback")
         picked = snap_to_sentences(_fallback_clips(segments, duration), segments)
     return picked
+
+
+def _fallback_clips(segments, duration):
+    """Deterministic backup: walk the transcript and form non-overlapping spans
+    (up to MAX_CLIP_SEC) on sentence boundaries, preferring the ones with the
+    most speech. Guarantees output for any video that has speech."""
+    if not segments:
+        return []
+    spans, i, n = [], 0, len(segments)
+    while i < n:
+        st = segments[i]["start"]
+        en, words, j = st, 0, i
+        while j < n and segments[j]["end"] - st <= config.MAX_CLIP_SEC:
+            en = segments[j]["end"]
+            words += len(segments[j].get("text", "").split())
+            j += 1
+        if en - st >= min(config.MIN_CLIP_SEC, duration):
+            spans.append({"start": st, "end": min(en, duration), "words": words})
+        i = max(j, i + 1)
+    if not spans:  # very short video → just use the whole thing
+        spans = [{"start": 0.0, "end": min(duration, config.MAX_CLIP_SEC), "words": 1}]
+    spans.sort(key=lambda s: s["words"], reverse=True)
+    picked = []
+    for s in spans:
+        no_overlap = all(s["end"] <= p["start"] or s["start"] >= p["end"] for p in picked)
+        if no_overlap:
+            picked.append({
+                "start": s["start"], "end": s["end"], "title": "Highlight",
+                "hook": 50, "emotion": 50, "energy": 50, "virality": 50,
+                "reason": "Selected as one of the most speech-dense moments.",
+            })
+        if len(picked) >= config.MAX_CLIPS:
+            break
+    picked.sort(key=lambda x: x["start"])
+    return picked
