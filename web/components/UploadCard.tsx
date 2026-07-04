@@ -238,3 +238,31 @@ export default function UploadCard({
             </p>
           </div>
         )}
+
+        {busy && mode === "file" && (
+          <div className="h-2 w-full overflow-hidden rounded-full bg-ink">
+            <div
+              className="h-full bg-brand transition-all"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+        )}
+        {error && <p className="text-sm text-red-400">{error}</p>}
+
+        <button
+          className="btn-primary"
+          disabled={!canSubmit || busy}
+          onClick={mode === "file" ? start : startUrl}
+        >
+          {busy
+            ? mode === "file"
+              ? `Uploading ${pct}%…`
+              : "Fetching & queuing…"
+            : mode === "file"
+            ? "Upload & generate Shorts"
+            : "Generate Shorts from link"}
+        </button>
+      </div>
+    </div>
+  );
+}
