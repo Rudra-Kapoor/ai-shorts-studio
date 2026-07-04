@@ -98,3 +98,8 @@ services:
         condition: service_completed_successfully
       serverless-redis-http:
         condition: service_started
+
+volumes:
+  mongo_data:
+  minio_data:
+  redis_data:
