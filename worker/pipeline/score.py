@@ -145,3 +145,22 @@ def find_clips(segments, duration: float) -> list:
             [s for w in windows[i:i + group] for s in w]
             for i in range(0, len(windows), group)
         ]
+
+    raw = []
+    for win in windows:
+        try:
+            raw.extend(_call_llm([_seg_line(s) for s in win], duration, config.MAX_CLIPS))
+        except Exception as e:  # noqa: BLE001 — one window failing shouldn't kill the rest
+            print(f"[score] window scoring failed: {e}")
+
+    # Normalize → snap/extend to full sentence spans → judge/dedup. Snapping
+    # BEFORE selection means the model can point at a short sentence and we grow
+    # it into a proper 15-60s clip, instead of the short pick being discarded.
+    cands = snap_to_sentences(_normalize(raw, duration), segments)
+    picked = _select(cands)
+    if not picked:
+        # The model returned nothing usable — guarantee clips anyway from the
+        # densest speech spans, so the user never gets "no clips".
+        print("[score] no usable LLM picks — using speech-density fallback")
+        picked = snap_to_sentences(_fallback_clips(segments, duration), segments)
+    return picked
