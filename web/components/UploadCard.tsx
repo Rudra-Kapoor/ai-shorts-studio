@@ -132,3 +132,35 @@ export default function UploadCard({
       setBusy(false);
     }
   }
+
+  const canSubmit = mode === "file" ? !!file : url.trim().length > 0;
+
+  return (
+    <div className="card p-6">
+      <h2 className="text-base font-semibold">Create Shorts</h2>
+      <p className="mt-1 text-sm text-gray-400">
+        Upload a video or paste a link — we transcribe it, find the viral
+        moments, and cut captioned Shorts.
+      </p>
+
+      {/* Source toggle */}
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => { setMode("file"); setError(null); }}
+          className={`rounded-xl border p-2 text-center text-sm transition ${
+            mode === "file" ? "border-brand bg-brand/10" : "border-edge hover:border-gray-500"
+          }`}
+        >
+          Upload file
+        </button>
+        <button
+          type="button"
+          onClick={() => { setMode("url"); setError(null); }}
+          className={`rounded-xl border p-2 text-center text-sm transition ${
+            mode === "url" ? "border-brand bg-brand/10" : "border-edge hover:border-gray-500"
+          }`}
+        >
+          YouTube link
+        </button>
+      </div>
