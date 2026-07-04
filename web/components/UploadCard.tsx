@@ -56,3 +56,33 @@ export default function UploadCard({
       });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || "could not get upload url");
+
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", j.uploadUrl);
+        xhr.setRequestHeader("Content-Type", file.type);
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) setPct(Math.round((e.loaded / e.total) * 100));
+        };
+        xhr.onload = () =>
+          xhr.status >= 200 && xhr.status < 300
+            ? resolve()
+            : reject(new Error("upload failed: " + xhr.status));
+        xhr.onerror = () => reject(new Error("network error during upload"));
+        xhr.send(file);
+      });
+
+      const reg = await fetch("/api/videos", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          userId: me.userId,
+          title: title || file.name,
+          key: j.key,
+          sizeBytes: file.size,
+          captionStyle,
+          aspectRatio,
+        }),
+      });
+      const regJson = await reg.json();
+      if (!reg.ok) throw new Error(regJson.error || "could not register video");
