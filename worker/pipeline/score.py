@@ -113,3 +113,19 @@ def _call_llm(seg_lines, duration, n) -> list:
     )
     content = r.json()["choices"][0]["message"]["content"]
     return _parse_json(content).get("clips", [])
+
+
+def _windows(segments, budget):
+    """Group consecutive segments into prompt-sized windows (by char count) so the
+    whole video gets scored, not just the part that fits in one prompt."""
+    windows, cur, cur_len = [], [], 0
+    for s in segments:
+        ln = len(s.get("text", "")) + 18
+        if cur and cur_len + ln > budget:
+            windows.append(cur)
+            cur, cur_len = [], 0
+        cur.append(s)
+        cur_len += ln
+    if cur:
+        windows.append(cur)
+    return windows
