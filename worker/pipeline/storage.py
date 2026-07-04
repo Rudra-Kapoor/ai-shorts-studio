@@ -102,3 +102,36 @@ def ensure_indexes() -> None:
         clips.create_index("videoId")
     except Exception as e:  # noqa: BLE001
         print(f"[storage] index setup skipped: {e}")
+
+
+ensure_indexes()
+
+
+# --- Upstash Redis (REST) queue ---
+def pop_job():
+    """RPOP one job from the queue (FIFO with the web app's LPUSH). Returns
+    a dict {videoId, userId} or None when the queue is empty.
+
+    Uses the Upstash REST command form (POST ["RPOP", key]) rather than the
+    path style — it's the canonical Upstash format and also works against a
+    local serverless-redis-http shim for offline dev."""
+    if not config.UPSTASH_URL:
+        return None
+    try:
+        r = requests.post(
+            config.UPSTASH_URL.rstrip("/"),
+            headers={"Authorization": f"Bearer {config.UPSTASH_TOKEN}"},
+            json=["RPOP", config.QUEUE_KEY],
+            timeout=10,
+        )
+        r.raise_for_status()
+        result = r.json().get("result")
+    except requests.RequestException as e:
+        print(f"[storage] pop_job failed: {e}")
+        return None
+    if not result:
+        return None
+    try:
+        return json.loads(result)
+    except (json.JSONDecodeError, TypeError):
+        return None
