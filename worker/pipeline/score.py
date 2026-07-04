@@ -199,3 +199,29 @@ def _fallback_clips(segments, duration):
             break
     picked.sort(key=lambda x: x["start"])
     return picked
+
+
+def _normalize(raw, duration):
+    """Parse raw LLM clips: clamp to the video, cap at MAX, keep scores. Short
+    clips are kept (not dropped) — snap_to_sentences grows them to a valid span."""
+    out = []
+    for c in raw:
+        try:
+            start = max(0.0, float(c["start"]))
+            end = min(duration, float(c["end"]))
+        except (KeyError, TypeError, ValueError):
+            continue
+        if end <= start:
+            continue
+        if end - start > config.MAX_CLIP_SEC:
+            end = start + config.MAX_CLIP_SEC
+        out.append({
+            "start": start, "end": end,
+            "title": str(c.get("title", "Untitled clip"))[:80],
+            "hook": _score(c.get("hook")),
+            "emotion": _score(c.get("emotion")),
+            "energy": _score(c.get("energy")),
+            "virality": _score(c.get("virality")),
+            "reason": str(c.get("reason", ""))[:200],
+        })
+    return out
