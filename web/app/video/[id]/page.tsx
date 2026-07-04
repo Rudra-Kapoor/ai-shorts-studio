@@ -57,3 +57,23 @@ export default function VideoPage() {
     await fetch(`/api/videos/${id}`, { method: "DELETE" }).catch(() => {});
     router.push("/");
   }
+
+  if (notFound) {
+    return (
+      <div className="card p-10 text-center text-gray-400">
+        Video not found.{" "}
+        <Link href="/" className="text-brand">
+          Back to studio
+        </Link>
+      </div>
+    );
+  }
+  if (!data) return <div className="text-gray-400">Loading…</div>;
+
+  const working = data.status === "queued" || data.status === "processing";
+
+  return (
+    <div>
+      <Link href="/" className="text-sm text-gray-400 hover:text-gray-200">
+        ← Back
+      </Link>
