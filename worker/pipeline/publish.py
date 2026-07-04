@@ -120,3 +120,24 @@ def publish_clip(clip_id: str, platform: str) -> dict:
     clip = storage.get_clip(clip_id)
     if not clip or not clip.get("editedKey"):
         return {"ok": False, "error": "clip not found or not rendered"}
+
+    title = clip.get("title", "Short")
+    caption = clip.get("caption") or title
+    tags = clip.get("hashtags", [])
+    description = (caption + "\n\n" + " ".join(f"#{t}" for t in tags)).strip()
+
+    if platform == "youtube":
+        tmp = tempfile.mkdtemp(prefix="pub_")
+        try:
+            local = os.path.join(tmp, "clip.mp4")
+            storage.download_file(clip["editedKey"], local)
+            res = publish_youtube(local, title, description, tags)
+        finally:
+            import shutil
+            shutil.rmtree(tmp, ignore_errors=True)
+    elif platform == "instagram":
+        # IG pulls the video from a public URL — hand it a presigned R2 link.
+        url = storage.presigned_get(clip["editedKey"], expires=3600)
+        res = publish_instagram(url, description)
+    else:
+        return {"ok": False, "error": f"unknown platform '{platform}'"}
