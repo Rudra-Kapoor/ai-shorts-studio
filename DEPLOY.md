@@ -20,3 +20,24 @@ git branch -M main
 git remote add origin https://github.com/<you>/ai-shorts-studio.git
 git push -u origin main
 ```
+
+---
+
+## 1) Cloudflare R2 — storage (free 10GB)
+
+1. Cloudflare dashboard → **R2** → *Create bucket* → name it **`ai-shorts`**.
+2. R2 → **Manage R2 API Tokens** → *Create API token* → permission **Object Read & Write** → Create.
+3. 📋 Save: **Account ID**, **Access Key ID**, **Secret Access Key**.
+4. R2 → your bucket → **Settings → CORS Policy** → add this (lets the browser upload):
+
+```json
+[
+  {
+    "AllowedOrigins": ["*"],
+    "AllowedMethods": ["PUT", "GET"],
+    "AllowedHeaders": ["*"],
+    "ExposeHeaders": ["ETag"]
+  }
+]
+```
+*(After Vercel is live, replace `"*"` with your Vercel URL to lock it down.)*
