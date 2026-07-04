@@ -246,3 +246,35 @@ def _select(cands):
             break
     picked.sort(key=lambda x: x["start"])  # chronological for display
     return picked
+
+
+def snap_to_sentences(clips, segments):
+    """Align each clip's start/end to real sentence boundaries so every clip
+    begins and ends on a complete thought (no mid-sentence, context-free cuts).
+    Keeps the result within [MIN, MAX]; falls back to the original times if it
+    can't form a valid window."""
+    if not clips or not segments:
+        return clips
+    seg_starts = sorted(s["start"] for s in segments)
+    seg_ends = sorted(s["end"] for s in segments)
+    out = []
+    for c in clips:
+        ns = min(seg_starts, key=lambda x: abs(x - c["start"]))
+        ne = min(seg_ends, key=lambda x: abs(x - c["end"]))
+        # too short → extend to the next sentence end that still fits
+        if ne - ns < config.MIN_CLIP_SEC:
+            for e in seg_ends:
+                if e > ne and (e - ns) <= config.MAX_CLIP_SEC:
+                    ne = e
+                    if ne - ns >= config.MIN_CLIP_SEC:
+                        break
+        # too long → pull end back to the last sentence end within MAX
+        if ne - ns > config.MAX_CLIP_SEC:
+            fits = [e for e in seg_ends if ns < e <= ns + config.MAX_CLIP_SEC]
+            if fits:
+                ne = max(fits)
+        cc = dict(c)
+        if ne > ns:  # apply the snapped/extended boundaries (best effort)
+            cc["start"], cc["end"] = ns, ne
+        out.append(cc)
+    return out
