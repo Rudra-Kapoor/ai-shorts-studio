@@ -89,3 +89,32 @@ def seed_default_trends() -> int:
         storage.upsert_trend(doc)
         n += 1
     return n
+
+
+def match_trends(clip_text: str, trends_list=None, k: int = 2) -> list:
+    """Return up to k closest trends to the clip text (by embedding cosine).
+    Pass trends_list to reuse a per-job fetch instead of re-reading Mongo."""
+    trends = trends_list if trends_list is not None else storage.all_trends()
+    if not trends:
+        return []
+    q = embed(clip_text)
+    if not q:
+        return []
+    scored = []
+    for t in trends:
+        emb = t.get("embedding")
+        if not emb:
+            continue
+        scored.append((_cosine(q, emb), t))
+    scored.sort(key=lambda x: x[0], reverse=True)
+    out = []
+    for sim, t in scored[:k]:
+        out.append({
+            "id": t.get("_id"),
+            "title": t.get("title"),
+            "hooks": t.get("hooks", []),
+            "hashtags": t.get("hashtags", []),
+            "style": t.get("style"),
+            "score": round(float(sim), 3),
+        })
+    return out
