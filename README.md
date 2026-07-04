@@ -107,3 +107,19 @@ trigger jobs. Use the same value in both Vercel and Render.
    - `WORKER_URL` = your Render URL
    - `WORKER_SECRET` = the same secret you gave Render
 4. Deploy.
+
+That's it. Open the Vercel URL, sign in with any email, upload a video.
+
+---
+
+## How a job runs (what you'll see)
+
+1. You upload → file goes **straight to R2** (the Vercel function never holds the
+   video, so big files are fine).
+2. The video appears as **Queued**. The web app pings the worker awake.
+3. First job: the worker cold-starts (~30–60s — the UI shows "warming up").
+4. Status moves: **Transcribing → Finding viral moments → Editing clip 1/3 …**
+5. Each finished Short pops into the page with its scores, caption, hashtags,
+   and a **Download** button.
+
+---
