@@ -50,3 +50,21 @@ export async function POST(
   if (!video) {
     return NextResponse.json({ error: "not found" }, { status: 404 });
   }
+
+  await db.collection(Collections.videos).updateOne(
+    { _id: params.id as any },
+    {
+      $set: {
+        status: "queued",
+        stage: "Re-queued",
+        progress: 0,
+        error: null,
+        updatedAt: new Date().toISOString(),
+      },
+    }
+  );
+  await enqueueJob({ videoId: params.id, userId: video.userId });
+  await wakeWorker();
+
+  return NextResponse.json({ ok: true });
+}
