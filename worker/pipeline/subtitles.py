@@ -83,3 +83,24 @@ def _group(words, max_words, max_chars):
     if cur:
         cards.append(cur)
     return cards
+
+
+def build_ass(words, clip_start: float, clip_end: float, out_path: str,
+              style: str = "hormozi", width: int = None, height: int = None) -> str:
+    s = STYLES.get((style or "").lower(), STYLES["hormozi"])
+    w = width or config.OUT_W
+    h = height or config.OUT_H
+    in_clip = [w2 for w2 in words if w2["end"] > clip_start and w2["start"] < clip_end]
+    events = []
+
+    for card in _group(in_clip, s["max_words"], s["max_chars"]):
+        start = max(0.0, card[0]["start"] - clip_start)
+        end = max(start + 0.2, card[-1]["end"] - clip_start)
+        text = _clean(" ".join(wd["word"].strip() for wd in card), s["uppercase"])
+        if not text:
+            continue
+        fin, fout = s["fade"]
+        body = f"{{\\fad({fin},{fout})\\q2}}{text}"
+        events.append(
+            f"Dialogue: 0,{_ass_time(start)},{_ass_time(end)},Cap,,0,0,0,,{body}"
+        )
