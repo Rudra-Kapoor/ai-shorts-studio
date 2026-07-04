@@ -101,3 +101,22 @@ def publish_instagram(video_url: str, caption: str) -> dict:
         if st.get("status_code") == "ERROR":
             return {"ok": False, "error": "IG processing error"}
         time.sleep(5)
+
+    # 3) publish
+    pub = requests.post(
+        f"{base}/media_publish",
+        data={"creation_id": container_id, "access_token": config.IG_ACCESS_TOKEN},
+        timeout=60,
+    )
+    if not pub.ok:
+        return {"ok": False, "error": f"IG publish failed: {pub.text[:200]}"}
+    media_id = pub.json().get("id")
+    return {"ok": True, "platform": "instagram", "id": media_id,
+            "url": f"https://www.instagram.com/reel/{media_id}"}
+
+
+# --------------------------- orchestration --------------------------
+def publish_clip(clip_id: str, platform: str) -> dict:
+    clip = storage.get_clip(clip_id)
+    if not clip or not clip.get("editedKey"):
+        return {"ok": False, "error": "clip not found or not rendered"}
