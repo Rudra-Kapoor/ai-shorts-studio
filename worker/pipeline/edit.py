@@ -105,3 +105,33 @@ def render_clip(src_video: str, start: float, end: float, ass_path: str,
     # come out silent or out of sync. `0:a:0?` makes audio optional so a
     # silent source still renders instead of failing.
     has_audio = True if dims is None else bool(dims.get("has_audio", True))
+
+    cmd = [
+        "ffmpeg", "-y",
+        "-ss", f"{fast:.3f}", "-i", os.path.abspath(src_video),
+        "-ss", f"{rem:.3f}", "-t", f"{duration:.3f}",
+        "-map", "0:v:0",
+    ]
+    if has_audio:
+        cmd += ["-map", "0:a:0?"]
+    cmd += [
+        "-vf", vf,
+        "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
+        "-pix_fmt", "yuv420p",                     # universal playback
+        "-avoid_negative_ts", "make_zero",
+    ]
+    if has_audio:
+        cmd += [
+            # aresample=async=1 fixes gaps/drift from seeking + VFR; then reset
+            # the timeline to 0 and loudness-normalize. Force standard stereo
+            # 48kHz AAC-LC — the widely-compatible combo browsers reliably play
+            # (some sources are 96kHz / odd layouts that won't decode on the web).
+            "-af", "aresample=async=1,asetpts=PTS-STARTPTS,loudnorm=I=-16:TP=-1.5:LRA=11",
+            "-c:a", "aac", "-profile:a", "aac_low", "-b:a", "128k",
+            "-ar", "48000", "-ac", "2",
+        ]
+    else:
+        cmd += ["-an"]
+    cmd += ["-movflags", "+faststart", os.path.abspath(out_path)]
+    subprocess.run(cmd, check=True, capture_output=True, cwd=work_dir)
+    return out_path
