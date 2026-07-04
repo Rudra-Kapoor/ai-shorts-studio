@@ -33,3 +33,19 @@ export default function VideoList({
       load();
     }
   }
+
+  useEffect(() => {
+    load();
+    // Poll so statuses (queued → processing → done) update live.
+    const t = setInterval(load, 4000);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshKey]);
+
+  if (loaded && videos.length === 0) {
+    return (
+      <div className="card mt-6 p-10 text-center text-gray-400">
+        No videos yet. Upload one above to generate your first Shorts. ✨
+      </div>
+    );
+  }
