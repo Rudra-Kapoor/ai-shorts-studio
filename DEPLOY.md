@@ -190,3 +190,6 @@ put it all on one line.)* You should get `{"ok":true,"seeded":5}`.
 | Captions look blank | Make sure you deployed the latest Dockerfile (it installs fonts). Redeploy. |
 | Mongo connection error | `0.0.0.0/0` not added in Atlas Network Access (step 2.3). |
 | `failed` status on a video | Open the video page → **Retry**. Check Render logs for the real error. |
+
+> Free-tier reality: one video at a time, ~30–60s cold starts, keep inputs under
+> ~50 min. Perfect for a portfolio/demo; add paid compute later for real traffic.
