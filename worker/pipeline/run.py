@@ -86,3 +86,23 @@ def _process_clip(video_id, user_id, src, tr, c, i, style, tmp, dims, seeded_tre
 
     key = f"clips/{user_id}/{video_id}/{clip_id}.mp4"
     storage.upload_file(out_path, key, content_type="video/mp4")
+
+    thumb_key = None
+    if config.THUMBNAILS:
+        try:
+            thumb_path = os.path.join(tmp, f"{clip_id}.jpg")
+            thumbnail.make_thumbnail(out_path, thumb_path, c["title"])
+            thumb_key = f"thumbs/{user_id}/{video_id}/{clip_id}.jpg"
+            storage.upload_file(thumb_path, thumb_key, content_type="image/jpeg")
+        except Exception as e:  # noqa: BLE001 — thumbnail is non-essential
+            print(f"[run] thumbnail failed: {e}")
+
+    # SRT caption file — a creator-friendly export they can re-edit/upload.
+    srt_key = None
+    try:
+        srt_path = os.path.join(tmp, f"{clip_id}.srt")
+        subtitles.build_srt(tr["segments"], c["start"], c["end"], srt_path)
+        srt_key = f"clips/{user_id}/{video_id}/{clip_id}.srt"
+        storage.upload_file(srt_path, srt_key, content_type="text/plain; charset=utf-8")
+    except Exception as e:  # noqa: BLE001 — non-essential
+        print(f"[run] srt failed: {e}")
