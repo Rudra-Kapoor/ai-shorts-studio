@@ -141,3 +141,8 @@ def publish_clip(clip_id: str, platform: str) -> dict:
         res = publish_instagram(url, description)
     else:
         return {"ok": False, "error": f"unknown platform '{platform}'"}
+
+    if res.get("ok"):
+        field = "youtubeUrl" if platform == "youtube" else "instagramUrl"
+        storage.update_clip(clip_id, {field: res["url"], "published": True})
+    return res
