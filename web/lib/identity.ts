@@ -21,3 +21,16 @@ export function getIdentity(): Identity | null {
     return null;
   }
 }
+
+export function signIn(email: string): Identity {
+  const id: Identity = {
+    userId: email.trim().toLowerCase(),
+    email: email.trim().toLowerCase(),
+  };
+  localStorage.setItem(KEY, JSON.stringify(id));
+  return id;
+}
+
+export function signOut() {
+  localStorage.removeItem(KEY);
+}
