@@ -1,0 +1,47 @@
+# Render Blueprint — one-click deploy for the worker.
+# In Render: New → Blueprint → connect this repo. Render reads this file,
+# builds the Docker worker, and asks you to fill in the secret env vars.
+#
+# Free plan notes: 512MB RAM, spins down after ~15 min idle, ~30-60s cold
+# start on the next request (that's the "warming up" the UI shows).
+
+services:
+  - type: web
+    name: ai-shorts-worker
+    runtime: docker
+    plan: free
+    dockerfilePath: ./worker/Dockerfile
+    dockerContext: ./worker
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        # Required for captions, hashtags, trend matching and vision scoring.
+        # Without it those features silently no-op (the worker still renders).
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB
+        value: ai_shorts
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET
+        value: ai-shorts
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false
+      - key: WORKER_SECRET
+        sync: false
+      - key: MAX_CLIPS
+        value: "3"
+      - key: MIN_CLIP_SEC
+        value: "15"
+      - key: MAX_CLIP_SEC
+        value: "60"
