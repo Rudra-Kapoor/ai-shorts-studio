@@ -59,3 +59,20 @@ def publish_youtube(file_path: str, title: str, description: str, tags: list) ->
     )
     start.raise_for_status()
     upload_url = start.headers["Location"]
+
+    # 2) upload the bytes
+    with open(file_path, "rb") as f:
+        up = requests.put(
+            upload_url,
+            headers={"Content-Type": "video/mp4", "Content-Length": str(size)},
+            data=f, timeout=600,
+        )
+    up.raise_for_status()
+    vid = up.json()["id"]
+    return {"ok": True, "platform": "youtube", "url": f"https://youtu.be/{vid}", "id": vid}
+
+
+# ----------------------------- Instagram ----------------------------
+def publish_instagram(video_url: str, caption: str) -> dict:
+    if not (config.IG_USER_ID and config.IG_ACCESS_TOKEN):
+        return {"ok": False, "error": "Instagram not configured (set IG_USER_ID/IG_ACCESS_TOKEN)"}
