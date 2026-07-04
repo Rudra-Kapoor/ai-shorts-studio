@@ -44,3 +44,17 @@ export async function consumeUsage(db: Db, userId: string): Promise<boolean> {
   );
   return true;
 }
+
+/** Give back a consumed slot when the work it was reserved for failed (so a
+ * Mongo/queue error after consumeUsage doesn't silently burn the user's day).
+ * Only decrements today's counter and never below zero. */
+export async function releaseUsage(db: Db, userId: string): Promise<void> {
+  const day = today();
+  await db.collection(Collections.users).updateOne(
+    { _id: userId as any, dayKey: day, videosToday: { $gt: 0 } },
+    {
+      $inc: { videosToday: -1, totalVideos: -1 },
+      $set: { updatedAt: new Date().toISOString() },
+    }
+  );
+}
