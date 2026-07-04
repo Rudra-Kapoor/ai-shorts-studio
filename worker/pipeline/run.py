@@ -51,3 +51,21 @@ def _err_detail(e: Exception) -> str:
             tail = " | ".join(err.strip().splitlines()[-3:])
             return f"{e} :: {tail}"
     return str(e)
+
+
+def _clip_transcript(segments, start, end):
+    parts = [s["text"] for s in segments if s["end"] > start and s["start"] < end]
+    return " ".join(parts).strip()
+
+
+def _blend_virality(base: int, visual) -> int:
+    return base if visual is None else int(round(0.8 * base + 0.2 * visual))
+
+
+def _process_clip(video_id, user_id, src, tr, c, i, style, tmp, dims, seeded_trends,
+                  out_w, out_h, ratio) -> None:
+    """Render + caption a single clip. Raises on hard failure; the caller
+    isolates it so other clips still succeed."""
+    clip_id = uuid.uuid4().hex
+    ass_path = os.path.join(tmp, f"{clip_id}.ass")
+    out_path = os.path.join(tmp, f"{clip_id}.mp4")
