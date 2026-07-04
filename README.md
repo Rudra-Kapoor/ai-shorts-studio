@@ -69,3 +69,19 @@ Take it slow; it's all copy-paste.
       "AllowedHeaders": ["*"] }]
    ```
    (Tighten `AllowedOrigins` to your Vercel URL once deployed.)
+
+### 2. MongoDB Atlas (database)
+1. Create a free **M0** cluster.
+2. *Database Access* → add a user/password.
+3. *Network Access* → allow `0.0.0.0/0` (any IP — needed for serverless).
+4. *Connect → Drivers* → copy the `mongodb+srv://…` URI.
+
+### 3. Upstash Redis (queue)
+1. Create a Redis database.
+2. Copy the **REST URL** and **REST TOKEN** (not the TCP one).
+
+### 4. Groq (Whisper + Llama)
+1. https://console.groq.com → **API Keys** → create one (`gsk_…`).
+
+### 5. Google Gemini (captions)
+1. https://aistudio.google.com/app/apikey → create a key (`AIza…`).
