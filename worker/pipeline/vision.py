@@ -30,3 +30,11 @@ def score_visual(frame_paths) -> "int | None":
             continue
     if len(parts) == 1:
         return None
+
+    try:
+        text = ai.gemini_generate(parts, temperature=0.2)
+        val = int(round(float(json.loads(text).get("visual", 50))))
+        return max(0, min(100, val))
+    except Exception as e:  # noqa: BLE001
+        print(f"[vision] scoring failed: {e}")
+        return None
