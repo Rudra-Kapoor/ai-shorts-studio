@@ -36,3 +36,13 @@ def make_thumbnail(clip_video: str, out_path: str, title: str = "", at: float = 
             return out_path
         except subprocess.CalledProcessError:
             pass  # fall through to plain grab
+
+    # Attempt 2: plain frame grab.
+    subprocess.run(
+        ["ffmpeg", "-y", "-ss", f"{at:.2f}", "-i", clip_video, "-frames:v", "1",
+         "-q:v", "3",
+         "-vf", "scale=720:1280:force_original_aspect_ratio=increase,crop=720:1280",
+         out_path],
+        check=True, capture_output=True,
+    )
+    return out_path
