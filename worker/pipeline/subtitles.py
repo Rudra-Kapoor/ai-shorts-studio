@@ -43,3 +43,22 @@ PlayResX: {w}
 PlayResY: {h}
 WrapStyle: 2
 ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Cap,{config.FONT_NAME},{size},{s['primary']},&H000000FF,{s['outline_col']},&H64000000,{s['bold']},0,0,0,100,100,0,0,1,{outline},{shadow},2,90,90,{marginv},1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+"""
+
+
+def _ass_time(t: float) -> str:
+    if t < 0:
+        t = 0.0
+    cs = int(round(t * 100))
+    h = cs // 360000
+    m = (cs % 360000) // 6000
+    s = (cs % 6000) // 100
+    c = cs % 100
+    return f"{h}:{m:02d}:{s:02d}.{c:02d}"
