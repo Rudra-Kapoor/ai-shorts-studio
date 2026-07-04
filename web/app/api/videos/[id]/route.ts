@@ -86,3 +86,20 @@ export async function DELETE(
     .collection(Collections.clips)
     .find({ videoId: params.id })
     .toArray();
+
+  // Best-effort storage cleanup (don't fail the delete if R2 hiccups).
+  const keys = [
+    video.originalKey,
+    ...clips.flatMap((c) => [c.editedKey, c.thumbnailKey, c.srtKey]),
+  ].filter(Boolean) as string[];
+  try {
+    await deleteObjects(keys);
+  } catch (e) {
+    console.error("[delete r2]", e);
+  }
+
+  await db.collection(Collections.clips).deleteMany({ videoId: params.id });
+  await db.collection(Collections.videos).deleteOne({ _id: params.id as any });
+
+  return NextResponse.json({ ok: true });
+}
