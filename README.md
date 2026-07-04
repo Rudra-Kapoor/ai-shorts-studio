@@ -166,3 +166,19 @@ v1 uses a demo identity in `localStorage` (`web/lib/identity.ts`) so there's zer
 auth setup. To productionize, drop in **Clerk** or **Supabase Auth**, then
 replace `getIdentity()`/`me.userId` with the real signed-in user id. The rest of
 the app already keys everything by `userId`, so it's a small change.
+
+---
+
+## Local development (optional — not required)
+
+Everything is built to run in the cloud, but if you want to iterate on the UI:
+
+```bash
+cd web
+npm install
+# create web/.env.local from web/.env.example
+npm run dev      # http://localhost:3000
+```
+
+The worker is best tested by deploying it; see `worker/README.md` for a local
+Docker option.
