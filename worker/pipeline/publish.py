@@ -76,3 +76,28 @@ def publish_youtube(file_path: str, title: str, description: str, tags: list) ->
 def publish_instagram(video_url: str, caption: str) -> dict:
     if not (config.IG_USER_ID and config.IG_ACCESS_TOKEN):
         return {"ok": False, "error": "Instagram not configured (set IG_USER_ID/IG_ACCESS_TOKEN)"}
+
+    base = f"https://graph.facebook.com/v20.0/{config.IG_USER_ID}"
+    # 1) create a REELS container pointing at the public video URL
+    create = requests.post(
+        f"{base}/media",
+        data={"media_type": "REELS", "video_url": video_url,
+              "caption": caption[:2200], "access_token": config.IG_ACCESS_TOKEN},
+        timeout=60,
+    )
+    if not create.ok:
+        return {"ok": False, "error": f"IG container failed: {create.text[:200]}"}
+    container_id = create.json().get("id")
+
+    # 2) wait for the container to finish processing
+    for _ in range(20):
+        st = requests.get(
+            f"https://graph.facebook.com/v20.0/{container_id}",
+            params={"fields": "status_code", "access_token": config.IG_ACCESS_TOKEN},
+            timeout=30,
+        ).json()
+        if st.get("status_code") == "FINISHED":
+            break
+        if st.get("status_code") == "ERROR":
+            return {"ok": False, "error": "IG processing error"}
+        time.sleep(5)
