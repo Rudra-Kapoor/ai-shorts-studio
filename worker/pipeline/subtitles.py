@@ -62,3 +62,24 @@ def _ass_time(t: float) -> str:
     s = (cs % 6000) // 100
     c = cs % 100
     return f"{h}:{m:02d}:{s:02d}.{c:02d}"
+
+
+def _clean(text: str, uppercase: bool) -> str:
+    text = text.replace("{", "").replace("}", "").replace("\n", " ").strip()
+    return text.upper() if uppercase else text
+
+
+def _group(words, max_words, max_chars):
+    cards, cur, cur_chars = [], [], 0
+    for w in words:
+        token = w["word"].strip()
+        if not token:
+            continue
+        if cur and (len(cur) >= max_words or cur_chars + len(token) > max_chars):
+            cards.append(cur)
+            cur, cur_chars = [], 0
+        cur.append(w)
+        cur_chars += len(token) + 1
+    if cur:
+        cards.append(cur)
+    return cards
