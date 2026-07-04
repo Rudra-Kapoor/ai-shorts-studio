@@ -77,3 +77,39 @@ export default function VideoPage() {
       <Link href="/" className="text-sm text-gray-400 hover:text-gray-200">
         ← Back
       </Link>
+
+      <div className="mt-3 flex items-start justify-between gap-4">
+        <h1 className="text-2xl font-semibold">{data.title}</h1>
+        <div className="flex items-center gap-3">
+          <StatusBadge status={data.status} />
+          <button
+            onClick={del}
+            className="rounded-lg px-2 py-1 text-sm text-gray-500 transition hover:bg-red-500/10 hover:text-red-400"
+            title="Delete video"
+          >
+            🗑
+          </button>
+        </div>
+      </div>
+
+      {/* Progress / status panel */}
+      {working && (
+        <div className="card mt-4 p-5">
+          <div className="flex items-center gap-3">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-edge border-t-brand" />
+            <div className="flex-1">
+              <div className="text-sm">{data.stage || "Working…"}</div>
+              <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-ink">
+                <div
+                  className="h-full bg-brand transition-all"
+                  style={{ width: `${data.progress ?? 5}%` }}
+                />
+              </div>
+            </div>
+          </div>
+          <p className="mt-3 text-xs text-gray-500">
+            The worker may take ~30–60s to wake up on the first job (free tier
+            cold start). This page updates automatically.
+          </p>
+        </div>
+      )}
