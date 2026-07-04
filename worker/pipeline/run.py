@@ -132,3 +132,24 @@ def _process_clip(video_id, user_id, src, tr, c, i, style, tmp, dims, seeded_tre
         "caption": cap["caption"], "hashtags": hashtags,
         "status": "done", "createdAt": _now(),
     })
+
+
+def _obtain_source(video, video_id, user_id, src) -> None:
+    """Put the source video at `src`. Either the already-uploaded original from
+    R2, or — for the "paste a link" flow — fetch it from the URL and persist it
+    to R2 so playback and retries work without re-downloading."""
+    if video.get("originalKey"):
+        storage.download_file(video["originalKey"], src)
+        return
+    url = video.get("sourceUrl")
+    if not url:
+        raise RuntimeError("No video source (no uploaded file and no link).")
+    storage.update_video(video_id, stage="Fetching video from link", progress=8)
+    info = fetch.download_youtube(url, src)
+    key = f"originals/{user_id}/{video_id}/source.mp4"
+    storage.upload_file(src, key, content_type="video/mp4")
+    fields = {"originalKey": key}
+    title = (info or {}).get("title")
+    if title and video.get("title") in (None, "", "YouTube video", "Untitled video"):
+        fields["title"] = title[:200]
+    storage.update_video(video_id, **fields)
