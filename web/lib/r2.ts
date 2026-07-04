@@ -36,3 +36,19 @@ function client(): S3Client {
   }
   return _client;
 }
+
+/** Presigned PUT url so the browser can upload straight to R2. */
+export async function getUploadUrl(key: string, contentType: string) {
+  const cmd = new PutObjectCommand({
+    Bucket: R2_BUCKET,
+    Key: key,
+    ContentType: contentType,
+  });
+  return getSignedUrl(client(), cmd, { expiresIn: 60 * 10 }); // 10 min
+}
+
+/** Presigned GET url so the browser can stream/download a private object. */
+export async function getDownloadUrl(key: string, expiresIn = 60 * 60) {
+  const cmd = new GetObjectCommand({ Bucket: R2_BUCKET, Key: key });
+  return getSignedUrl(client(), cmd, { expiresIn });
+}
