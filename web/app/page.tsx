@@ -90,3 +90,9 @@ export default function Home() {
           </button>
         </div>
       </div>
+
+      <UploadCard me={me} onCreated={() => setRefreshKey((k) => k + 1)} />
+      <VideoList me={me} refreshKey={refreshKey} />
+    </div>
+  );
+}
