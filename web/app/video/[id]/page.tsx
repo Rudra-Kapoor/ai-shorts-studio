@@ -138,3 +138,26 @@ export default function VideoPage() {
           />
         </details>
       )}
+
+      {/* Clips */}
+      <h2 className="mt-8 text-lg font-semibold">
+        Generated Shorts{" "}
+        {data.clips.length > 0 && (
+          <span className="text-gray-500">({data.clips.length})</span>
+        )}
+      </h2>
+
+      {data.clips.length === 0 ? (
+        <p className="mt-2 text-sm text-gray-400">
+          {working ? "Clips will appear here as they finish rendering." : "No clips."}
+        </p>
+      ) : (
+        <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {data.clips.map((c) => (
+            <ClipCard key={c._id} clip={c} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
