@@ -51,3 +51,27 @@ MAX_CLIP_SEC = _int("MAX_CLIP_SEC", 60)
 # at least one clip (and fall back to speech-density selection if the model
 # declines), so this never causes "no clips". Lower/raise to taste.
 MIN_VIRALITY = _int("MIN_VIRALITY", 35)
+
+# Output dimensions per aspect ratio. 9:16 is the tuned default; 1:1 and 16:9
+# let the same pipeline target square feed posts and landscape.
+RATIOS = {
+    "9:16": (1080, 1920),
+    "1:1": (1080, 1080),
+    "16:9": (1920, 1080),
+}
+DEFAULT_RATIO = os.getenv("ASPECT_RATIO", "9:16")
+OUT_W, OUT_H = RATIOS.get(DEFAULT_RATIO, RATIOS["9:16"])
+
+
+def dims_for(ratio):
+    """(width, height) for a ratio key; falls back to 9:16."""
+    return RATIOS.get(ratio, RATIOS["9:16"])
+
+# --- Phase 2 ---
+# Default caption style: hormozi | mrbeast | minimal | clean (per-video override
+# comes from the upload form).
+CAPTION_STYLE = os.getenv("CAPTION_STYLE", "hormozi")
+# Generate a thumbnail per clip.
+THUMBNAILS = os.getenv("THUMBNAILS", "1") == "1"
+# Gemini-vision keyframe scoring (off by default — costs extra API calls).
+VISION_SCORING = os.getenv("VISION_SCORING", "0") == "1"
