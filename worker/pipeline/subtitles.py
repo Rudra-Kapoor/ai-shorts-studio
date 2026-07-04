@@ -120,3 +120,22 @@ def _srt_time(t: float) -> str:
     m, ms = divmod(ms, 60_000)
     s, ms = divmod(ms, 1000)
     return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
+
+
+def build_srt(segments, clip_start: float, clip_end: float, out_path: str) -> str:
+    """Standard .srt caption file for the clip (for re-editing / accessibility /
+    uploading alongside the video). Built from sentence-level segments."""
+    blocks, idx = [], 1
+    for seg in segments:
+        if seg["end"] <= clip_start or seg["start"] >= clip_end:
+            continue
+        st = max(0.0, seg["start"] - clip_start)
+        en = max(st + 0.3, min(seg["end"], clip_end) - clip_start)
+        text = seg["text"].strip()
+        if not text:
+            continue
+        blocks.append(f"{idx}\n{_srt_time(st)} --> {_srt_time(en)}\n{text}\n")
+        idx += 1
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(blocks))
+    return out_path
