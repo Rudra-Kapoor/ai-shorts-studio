@@ -34,3 +34,19 @@ export async function GET(
       (c as any).thumbnailUrl = await getDownloadUrl(c.thumbnailKey);
     if (c.srtKey) (c as any).srtUrl = await getDownloadUrl(c.srtKey);
   }
+
+  return NextResponse.json({ video: { ...video, clips } });
+}
+
+// POST /api/videos/:id  → retry a failed/stuck video.
+export async function POST(
+  _req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const db = await getDb();
+  const video = await db
+    .collection(Collections.videos)
+    .findOne({ _id: params.id as any });
+  if (!video) {
+    return NextResponse.json({ error: "not found" }, { status: 404 });
+  }
