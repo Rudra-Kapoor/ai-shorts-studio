@@ -63,3 +63,31 @@ def _transcribe_file(audio_path: str, max_attempts: int = 4) -> dict:
         if last_exc:
             raise last_exc
         raise RuntimeError("transcription failed")
+
+    words = [
+        {"word": w.get("word", "").strip(), "start": float(w["start"]), "end": float(w["end"])}
+        for w in j.get("words", []) if "start" in w and "end" in w
+    ]
+    segments = [
+        {"text": s.get("text", "").strip(), "start": float(s["start"]), "end": float(s["end"])}
+        for s in j.get("segments", []) if "start" in s and "end" in s
+    ]
+    return {"text": j.get("text", ""), "words": words, "segments": segments}
+
+
+def _words_from_segments(segments) -> list:
+    """Fallback: spread each segment's words evenly across its time span."""
+    out = []
+    for s in segments:
+        toks = s["text"].split()
+        if not toks:
+            continue
+        span = max(0.2, s["end"] - s["start"])
+        step = span / len(toks)
+        for i, tok in enumerate(toks):
+            out.append({
+                "word": tok,
+                "start": s["start"] + i * step,
+                "end": s["start"] + (i + 1) * step,
+            })
+    return out
