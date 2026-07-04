@@ -36,3 +36,18 @@ import config
 
 def _now():
     return datetime.now(timezone.utc).isoformat()
+
+
+def _err_detail(e: Exception) -> str:
+    """Surface ffmpeg/ffprobe stderr. We run subprocesses with capture_output,
+    so a CalledProcessError's str() is just the exit code — the real reason
+    (codec, missing stream, filter error) lives in stderr. Pull the tail of it
+    so logs and the stored `error` field actually say what went wrong."""
+    if isinstance(e, subprocess.CalledProcessError):
+        err = e.stderr
+        if isinstance(err, bytes):
+            err = err.decode("utf-8", "ignore")
+        if err:
+            tail = " | ".join(err.strip().splitlines()[-3:])
+            return f"{e} :: {tail}"
+    return str(e)
