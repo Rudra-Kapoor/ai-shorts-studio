@@ -67,3 +67,21 @@ export default function ClipCard({ clip }: { clip: Clip }) {
           </div>
         )}
       </div>
+
+      <div className="space-y-3 p-4">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-medium leading-tight">{clip.title}</h3>
+          <span className="badge bg-brand/20 text-brand">
+            🔥 {clip.scores?.virality ?? 0}
+          </span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400">
+          <span>
+            {fmt(clip.startSec)} – {fmt(clip.endSec)} ·{" "}
+            {Math.round(clip.durationSec)}s
+          </span>
+          {clip.captionStyle && (
+            <span className="badge bg-edge text-gray-300">{clip.captionStyle}</span>
+          )}
+        </div>
