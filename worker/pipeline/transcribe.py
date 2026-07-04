@@ -91,3 +91,24 @@ def _words_from_segments(segments) -> list:
                 "end": s["start"] + (i + 1) * step,
             })
     return out
+
+
+def _offset(result: dict, by: float) -> dict:
+    for w in result["words"]:
+        w["start"] += by
+        w["end"] += by
+    for s in result["segments"]:
+        s["start"] += by
+        s["end"] += by
+    return result
+
+
+def _split_audio(audio_path: str, out_dir: str, chunk_sec: int) -> list:
+    pattern = os.path.join(out_dir, "chunk_%04d.mp3")
+    subprocess.run(
+        ["ffmpeg", "-y", "-i", audio_path,
+         "-f", "segment", "-segment_time", str(chunk_sec),
+         "-c:a", "libmp3lame", "-b:a", "64k", pattern],
+        check=True, capture_output=True,
+    )
+    return sorted(glob.glob(os.path.join(out_dir, "chunk_*.mp3")))
