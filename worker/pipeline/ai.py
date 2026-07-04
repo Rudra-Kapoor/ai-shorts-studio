@@ -13,3 +13,40 @@ import requests
 import config
 
 RETRYABLE = {429, 500, 502, 503, 504}
+
+
+def _backoff(attempt: int, retry_after) -> None:
+    if retry_after:
+        try:
+            time.sleep(min(float(retry_after), 30))
+            return
+        except (TypeError, ValueError):
+            pass
+    # 1s, 2s, 4s, 8s … capped at 20s
+    time.sleep(min(2 ** attempt, 20))
+
+
+def post_with_retry(url, *, headers=None, json=None, data=None,
+                    timeout=120, max_attempts=4) -> requests.Response:
+    """POST with retry on 429/5xx. Raises on non-retryable errors or after the
+    final attempt. For multipart file uploads (which can't be safely replayed)
+    callers should retry around their own file handle instead."""
+    last_exc = None
+    for attempt in range(max_attempts):
+        try:
+            r = requests.post(url, headers=headers, json=json, data=data, timeout=timeout)
+        except requests.RequestException as e:
+            last_exc = e
+            if attempt < max_attempts - 1:
+                _backoff(attempt, None)
+                continue
+            raise
+        if r.status_code in RETRYABLE and attempt < max_attempts - 1:
+            print(f"[ai] {r.status_code} from {url.split('?')[0]} — retry {attempt + 1}")
+            _backoff(attempt, r.headers.get("Retry-After"))
+            continue
+        r.raise_for_status()
+        return r
+    if last_exc:
+        raise last_exc
+    raise RuntimeError("post_with_retry: exhausted attempts")
