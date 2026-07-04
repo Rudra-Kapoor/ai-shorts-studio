@@ -148,3 +148,22 @@ put it all on one line.)* You should get `{"ok":true,"seeded":5}`.
 2. Pick a **caption style**, choose a short video, **Upload & generate Shorts**.
 3. First job: the worker cold-starts (~30–60s). The page shows live progress.
 4. Finished Shorts appear with thumbnails, scores, captions, hashtags, Download.
+
+---
+
+## ✅ What's enabled by default
+- Whisper transcription (auto-chunks long videos)
+- Viral-moment detection + scoring
+- 4 caption styles (Hormozi / MrBeast / Clean / Minimal)
+- 9:16 render with burned-in captions
+- Thumbnails
+- Captions + hashtags
+- Trend matching (after you seed in step 9)
+
+## 🔧 Optional power-ups (flip on in Render env, then redeploy)
+| Feature | How to enable |
+|---|---|
+| **Gemini-vision scoring** | set `VISION_SCORING=1` |
+| **Face-aware smart crop** | add `opencv-python-headless==4.10.0.84` to `worker/requirements.txt`, set `FACE_CROP=1` |
+| **Auto-post to YouTube** | set `YT_CLIENT_ID`, `YT_CLIENT_SECRET`, `YT_REFRESH_TOKEN` (see below) |
+| **Auto-post to Instagram** | set `IG_USER_ID`, `IG_ACCESS_TOKEN` (Business/Creator account) |
