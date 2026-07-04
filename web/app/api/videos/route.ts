@@ -60,3 +60,26 @@ export async function POST(req: NextRequest) {
       createdAt: now,
       updatedAt: now,
     };
+
+    const db = await getDb();
+
+    // Enforce the per-user daily quota before doing any work.
+    const allowed = await consumeUsage(db, userId);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: `Daily limit reached (${MAX_VIDEOS_PER_DAY} videos/day). Try again tomorrow.` },
+        { status: 429 }
+      );
+    }
+
+    // The quota slot is already consumed; if registering or queuing the job
+    // fails, hand the slot back so a transient error doesn't burn the user's day.
+    try {
+      await db.collection(Collections.videos).insertOne(video as any);
+      // Enqueue + nudge the (possibly sleeping) worker awake.
+      await enqueueJob({ videoId: video._id, userId });
+      await wakeWorker();
+    } catch (workErr) {
+      await releaseUsage(db, userId).catch(() => {});
+      throw workErr;
+    }
