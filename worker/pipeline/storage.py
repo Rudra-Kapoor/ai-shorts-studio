@@ -49,3 +49,20 @@ def presigned_get(key: str, expires: int = 3600) -> str:
         Params={"Bucket": config.R2_BUCKET, "Key": key},
         ExpiresIn=expires,
     )
+
+
+# --- MongoDB ---
+_mongo = MongoClient(config.MONGODB_URI)
+_db = _mongo[config.MONGODB_DB]
+videos = _db["videos"]
+clips = _db["clips"]
+trends = _db["trends"]
+
+
+def get_video(video_id: str):
+    return videos.find_one({"_id": video_id})
+
+
+def update_video(video_id: str, **fields) -> None:
+    fields["updatedAt"] = datetime.now(timezone.utc).isoformat()
+    videos.update_one({"_id": video_id}, {"$set": fields})
