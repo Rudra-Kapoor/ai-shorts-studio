@@ -22,3 +22,27 @@ function Score({ label, value }: { label: string; value: number }) {
     </div>
   );
 }
+
+export default function ClipCard({ clip }: { clip: Clip }) {
+  const [copied, setCopied] = useState(false);
+  const [posting, setPosting] = useState<string | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  async function publish(platform: "youtube" | "instagram") {
+    setPosting(platform);
+    setMsg(null);
+    try {
+      const r = await fetch(`/api/clips/${clip._id}/publish`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ platform }),
+      });
+      const data = await r.json();
+      if (data.ok && data.url) setMsg(`Posted → ${data.url}`);
+      else setMsg(data.error || "Could not post (check setup).");
+    } catch (e: any) {
+      setMsg(e.message || "post failed");
+    } finally {
+      setPosting(null);
+    }
+  }
