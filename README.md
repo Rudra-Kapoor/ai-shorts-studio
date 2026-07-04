@@ -5,6 +5,9 @@ cloud tiers**. Upload a video, and an AI pipeline transcribes it, finds the most
 viral moments, crops them to 9:16, burns on word-by-word captions, and writes a
 caption + hashtags for each clip.
 
+> 🚀 **Want to run it on your own computer, step by step?** →
+> **[QUICKSTART.md](QUICKSTART.md)** — a beginner-friendly ~10-minute guide.
+
 > **Nothing runs on your computer.** Your PC only holds the code and pushes to
 > GitHub. Every running piece lives in a free cloud service that sleeps when
 > idle. The heavy video worker *wakes on a job, processes, then sleeps* — so
