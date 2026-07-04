@@ -62,3 +62,39 @@ services:
     restart: unless-stopped
     volumes:
       - redis_data:/data
+
+  # Speaks the Upstash REST API in front of plain Redis, so both the web app
+  # (@upstash/redis) and the worker talk to it unchanged.
+  serverless-redis-http:
+    image: hiett/serverless-redis-http:latest
+    restart: unless-stopped
+    environment:
+      SRH_MODE: env
+      SRH_TOKEN: localdevtoken
+      SRH_CONNECTION_STRING: "redis://redis:6379"
+    ports:
+      - "8079:80"
+    depends_on:
+      - redis
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./worker/.env.worker.local
+    # Mount the source so local code edits only need `docker compose restart
+    # worker` (no image rebuild). yt-dlp etc. live in the image's site-packages,
+    # which the mount doesn't touch. Cloud (render.yaml) doesn't use this.
+    volumes:
+      - ./worker:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      mongo:
+        condition: service_healthy
+      createbuckets:
+        condition: service_completed_successfully
+      serverless-redis-http:
+        condition: service_started
