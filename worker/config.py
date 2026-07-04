@@ -33,3 +33,21 @@ S3_PATH_STYLE = bool(_R2_ENDPOINT_OVERRIDE)
 # --- Database (MongoDB Atlas) ---
 MONGODB_URI = os.getenv("MONGODB_URI", "")
 MONGODB_DB = os.getenv("MONGODB_DB", "ai_shorts")
+
+# --- Queue (Upstash Redis REST) ---
+UPSTASH_URL = os.getenv("UPSTASH_REDIS_REST_URL", "")
+UPSTASH_TOKEN = os.getenv("UPSTASH_REDIS_REST_TOKEN", "")
+QUEUE_KEY = "ass:jobs"
+
+# --- Security ---
+WORKER_SECRET = os.getenv("WORKER_SECRET", "")
+
+# --- Pipeline tuning ---
+MAX_CLIPS = _int("MAX_CLIPS", 3)
+MIN_CLIP_SEC = _int("MIN_CLIP_SEC", 15)
+MAX_CLIP_SEC = _int("MAX_CLIP_SEC", 60)
+# Minimum overall virality (0-100) for a clip to be kept when there are MORE
+# candidates than MAX_CLIPS — it just trims the weakest extras. We always return
+# at least one clip (and fall back to speech-density selection if the model
+# declines), so this never causes "no clips". Lower/raise to taste.
+MIN_VIRALITY = _int("MIN_VIRALITY", 35)
