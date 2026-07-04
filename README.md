@@ -149,3 +149,20 @@ That's it. Open the Vercel URL, sign in with any email, upload a video.
   `.srt` caption export, user accounts + per-day quota (`MAX_VIDEOS_PER_DAY`),
   delete a video (clips + storage cleaned up), upload size guard, resilient API
   retries, and per-clip fault isolation.
+
+See `DEPLOY.md` for how to turn the optional power-ups on. Everything optional is
+**off by default** so the lean free-tier deploy stays fast and reliable.
+
+### Still ideal future work
+- Real auth (Clerk/Supabase) instead of the demo localStorage identity.
+- Per-frame dynamic face tracking (current smart crop is a per-clip recenter).
+- Performance analytics + RL from engagement.
+
+---
+
+## Adding real auth (when you're ready)
+
+v1 uses a demo identity in `localStorage` (`web/lib/identity.ts`) so there's zero
+auth setup. To productionize, drop in **Clerk** or **Supabase Auth**, then
+replace `getIdentity()`/`me.userId` with the real signed-in user id. The rest of
+the app already keys everything by `userId`, so it's a small change.
