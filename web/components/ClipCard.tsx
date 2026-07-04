@@ -104,3 +104,47 @@ export default function ClipCard({ clip }: { clip: Clip }) {
             <Score label="Visual" value={clip.scores?.visual ?? 0} />
           ) : null}
         </div>
+
+        {clip.reason && (
+          <p className="text-xs italic text-gray-500">“{clip.reason}”</p>
+        )}
+
+        {clip.caption && (
+          <div className="rounded-lg bg-ink p-3 text-sm">
+            <p>{clip.caption}</p>
+            {clip.hashtags && clip.hashtags.length > 0 && (
+              <p className="mt-2 text-brand">
+                {clip.hashtags.map((h) => `#${h.replace(/^#/, "")}`).join(" ")}
+              </p>
+            )}
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-2">
+          {clip.editedUrl && (
+            <a className="btn-primary flex-1" href={clip.editedUrl} download>
+              Download
+            </a>
+          )}
+          {clip.srtUrl && (
+            <a className="btn-ghost" href={clip.srtUrl} download title="Download captions (.srt)">
+              .SRT
+            </a>
+          )}
+          {clip.caption && (
+            <button
+              className="btn-ghost"
+              onClick={() => {
+                const tags = (clip.hashtags || [])
+                  .map((h) => `#${h.replace(/^#/, "")}`)
+                  .join(" ");
+                const text = `${clip.caption ?? ""}\n\n${tags}`;
+                navigator.clipboard.writeText(text);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 1500);
+              }}
+            >
+              {copied ? "Copied!" : "Copy caption"}
+            </button>
+          )}
+        </div>
