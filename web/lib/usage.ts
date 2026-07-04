@@ -21,3 +21,26 @@ export async function getUsage(db: Db, userId: string) {
     remaining: Math.max(0, MAX_VIDEOS_PER_DAY - used),
   };
 }
+
+/** Returns true if the user had quota and it was consumed; false if over limit. */
+export async function consumeUsage(db: Db, userId: string): Promise<boolean> {
+  const day = today();
+  const u = await db.collection(Collections.users).findOne({ _id: userId as any });
+  const used = u && u.dayKey === day ? u.videosToday || 0 : 0;
+  if (used >= MAX_VIDEOS_PER_DAY) return false;
+
+  await db.collection(Collections.users).updateOne(
+    { _id: userId as any },
+    {
+      $set: { dayKey: day, videosToday: used + 1, updatedAt: new Date().toISOString() },
+      $inc: { totalVideos: 1 },
+      $setOnInsert: {
+        email: userId,
+        subscription: "free",
+        createdAt: new Date().toISOString(),
+      },
+    },
+    { upsert: true }
+  );
+  return true;
+}
