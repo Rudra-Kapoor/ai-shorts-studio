@@ -31,3 +31,19 @@ docker build -t ass-worker ./worker
 docker run --rm -p 8000:8000 --env-file .env ass-worker
 # then: curl -X POST localhost:8000/wake -H "x-worker-secret: <yours>"
 ```
+
+## Deploy (Render, free)
+
+Use the repo-root `render.yaml` blueprint, or manually:
+1. New → Web Service → this repo
+2. Root directory: `worker`, Runtime: Docker
+3. Add the env vars from `../.env.example` (WORKER block)
+4. Health check path: `/health`
+
+Alternatives that also work unchanged: Hugging Face Spaces (Docker), Google
+Cloud Run, Fly.io.
+
+## Tuning
+
+`MAX_CLIPS`, `MIN_CLIP_SEC`, `MAX_CLIP_SEC`, and the model names are all env vars
+(see `config.py`).
