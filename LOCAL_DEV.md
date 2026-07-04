@@ -14,3 +14,20 @@ Browser ─▶ Web (Next.js, host :3000)
 ```
 
 The Docker stack replaces the cloud services 1:1:
+
+| Cloud (prod) | Local (dev) |
+|---|---|
+| Cloudflare R2 | MinIO (`minio/minio`) |
+| MongoDB Atlas | `mongo:7` |
+| Upstash Redis (REST) | `redis:7` + `serverless-redis-http` shim |
+| Render worker | the `worker` image, built locally |
+| Vercel web | `npm run dev` on the host |
+
+## One-time setup
+
+1. **Add your Groq key.** Edit [worker/.env.worker.local](worker/.env.worker.local)
+   and set `GROQ_API_KEY=` (from https://console.groq.com → API Keys). Optionally
+   set `GEMINI_API_KEY=` (https://aistudio.google.com/app/apikey).
+2. Make sure **Docker Desktop** is running.
+
+## Start it
