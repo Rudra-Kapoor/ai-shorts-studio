@@ -38,3 +38,7 @@ def face_center_frac(frame_paths) -> "float | None":
         # Use the largest face in the frame.
         fx, fy, fw, fh = max(faces, key=lambda b: b[2] * b[3])
         centers.append((fx + fw / 2) / float(w))
+
+    if not centers:
+        return None
+    return float(median(centers))
