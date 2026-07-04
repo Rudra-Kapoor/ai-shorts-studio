@@ -51,3 +51,21 @@ ai-shorts-studio/
 ├── render.yaml Render blueprint for the worker
 └── .env.example  every secret, annotated
 ```
+
+---
+
+## Setup — step by step
+
+You'll create 6 free accounts and paste keys into 2 places (Vercel + Render).
+Take it slow; it's all copy-paste.
+
+### 1. Cloudflare R2 (storage)
+1. Cloudflare dashboard → **R2** → *Create bucket* named `ai-shorts`.
+2. R2 → *Manage API Tokens* → create a token with **Object Read & Write**.
+3. Note: **Account ID**, **Access Key ID**, **Secret Access Key**.
+4. **CORS** (so the browser can upload): R2 bucket → Settings → CORS, add:
+   ```json
+   [{ "AllowedOrigins": ["*"], "AllowedMethods": ["PUT","GET"],
+      "AllowedHeaders": ["*"] }]
+   ```
+   (Tighten `AllowedOrigins` to your Vercel URL once deployed.)
