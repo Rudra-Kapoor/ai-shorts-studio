@@ -83,3 +83,10 @@ export async function POST(req: NextRequest) {
       await releaseUsage(db, userId).catch(() => {});
       throw workErr;
     }
+
+    return NextResponse.json({ video });
+  } catch (err: any) {
+    console.error("[videos POST]", err);
+    return NextResponse.json({ error: err.message || "failed" }, { status: 500 });
+  }
+}
