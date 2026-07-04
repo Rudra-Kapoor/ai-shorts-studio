@@ -21,3 +21,21 @@ export async function GET(req: NextRequest) {
     .toArray();
   return NextResponse.json({ videos });
 }
+
+// POST /api/videos { userId, title, key, sizeBytes }
+// Registers an uploaded video, enqueues the processing job, and wakes the worker.
+export async function POST(req: NextRequest) {
+  try {
+    const { userId, title, key, sourceUrl, sizeBytes, captionStyle, aspectRatio } = await req.json();
+    if (!userId || (!key && !sourceUrl)) {
+      return NextResponse.json(
+        { error: "userId and either an uploaded file key or a video link are required" },
+        { status: 400 }
+      );
+    }
+    if (sourceUrl && !/^https?:\/\/\S+$/i.test(sourceUrl)) {
+      return NextResponse.json(
+        { error: "sourceUrl must be a valid http(s) link" },
+        { status: 400 }
+      );
+    }
