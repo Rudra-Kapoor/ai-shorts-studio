@@ -50,3 +50,22 @@ def post_with_retry(url, *, headers=None, json=None, data=None,
     if last_exc:
         raise last_exc
     raise RuntimeError("post_with_retry: exhausted attempts")
+
+
+def gemini_generate(parts, temperature: float = 0.7, timeout: int = 60) -> str:
+    """Call Gemini generateContent (JSON mode) with retry and return the raw
+    text of the first candidate. Shared by the caption + vision agents so the
+    URL/body/parse boilerplate lives in one place."""
+    url = (
+        f"https://generativelanguage.googleapis.com/v1beta/models/"
+        f"{config.GEMINI_MODEL}:generateContent?key={config.GEMINI_API_KEY}"
+    )
+    body = {
+        "contents": [{"parts": parts}],
+        "generationConfig": {
+            "temperature": temperature,
+            "response_mime_type": "application/json",
+        },
+    }
+    r = post_with_retry(url, json=body, timeout=timeout)
+    return r.json()["candidates"][0]["content"]["parts"][0]["text"]
