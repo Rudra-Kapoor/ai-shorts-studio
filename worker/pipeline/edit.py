@@ -56,3 +56,19 @@ def extract_frames(src_video: str, start: float, end: float, n: int, out_dir: st
         except subprocess.CalledProcessError:
             continue
     return paths
+
+
+def _crop_filter(crop_frac, dims, W, H):
+    """Build the crop filter. crop_frac in [0,1] re-centers horizontally around a
+    point of interest (e.g. a face); None = centered crop. Uses pre-probed dims
+    so we don't run another ffprobe per clip."""
+    if crop_frac is None or not dims:
+        return f"crop={W}:{H}"
+    iw, ih = dims.get("width", 0), dims.get("height", 0)
+    if not iw or not ih:
+        return f"crop={W}:{H}"
+    scaled_w = round(H * iw / ih) if (iw / ih) > (W / H) else W
+    if scaled_w > W:
+        x = int(min(max(crop_frac * scaled_w - W / 2, 0), scaled_w - W))
+        return f"crop={W}:{H}:{x}:0"
+    return f"crop={W}:{H}"
