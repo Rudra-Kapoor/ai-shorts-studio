@@ -106,3 +106,29 @@ def _process_clip(video_id, user_id, src, tr, c, i, style, tmp, dims, seeded_tre
         storage.upload_file(srt_path, srt_key, content_type="text/plain; charset=utf-8")
     except Exception as e:  # noqa: BLE001 — non-essential
         print(f"[run] srt failed: {e}")
+
+    clip_text = _clip_transcript(tr["segments"], c["start"], c["end"])
+    matched = trends.match_trends(clip_text, seeded_trends) if config.GEMINI_API_KEY else []
+    trend_titles = [m["title"] for m in matched]
+    hint = "; ".join(f"{m['title']} (e.g. '{m['hooks'][0]}')" for m in matched if m.get("hooks"))
+    extra_tags = []
+    for m in matched:
+        extra_tags.extend(m.get("hashtags", []))
+
+    cap = caption.generate_caption(clip_text or c["title"], trend_hint=hint)
+    hashtags = list(dict.fromkeys((cap["hashtags"] or []) + extra_tags))[:15]
+
+    storage.upsert_clip({
+        "_id": clip_id, "videoId": video_id, "userId": user_id, "index": i,
+        "title": c["title"], "startSec": c["start"], "endSec": c["end"],
+        "durationSec": c["end"] - c["start"],
+        "scores": {
+            "hook": c["hook"], "emotion": c["emotion"], "energy": c["energy"],
+            "visual": visual if visual is not None else 0, "virality": virality,
+        },
+        "reason": c["reason"], "captionStyle": style, "aspectRatio": ratio,
+        "editedKey": key, "thumbnailKey": thumb_key, "srtKey": srt_key,
+        "trendMatch": trend_titles,
+        "caption": cap["caption"], "hashtags": hashtags,
+        "status": "done", "createdAt": _now(),
+    })
