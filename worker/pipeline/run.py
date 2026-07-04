@@ -211,3 +211,16 @@ def process_job(video_id: str, user_id: str) -> None:
             except Exception as e:  # noqa: BLE001 — isolate per-clip failures
                 traceback.print_exc()
                 print(f"[run] clip {i} failed: {_err_detail(e)}")
+
+        if succeeded == 0:
+            raise RuntimeError("All clips failed to render")
+
+        storage.update_video(video_id, status="done", stage="Done", progress=100, error=None)
+        print(f"[run] video {video_id} done — {succeeded}/{total} clips (style={style})")
+
+    except Exception as e:  # noqa: BLE001
+        traceback.print_exc()
+        storage.update_video(video_id, status="failed", stage="Failed",
+                             error=_err_detail(e)[:500])
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
