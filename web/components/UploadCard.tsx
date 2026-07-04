@@ -213,3 +213,28 @@ export default function UploadCard({
             ))}
           </div>
         </div>
+
+        {mode === "file" ? (
+          <input
+            ref={inputRef}
+            className="input file:mr-3 file:rounded-md file:border-0 file:bg-brand file:px-3 file:py-1 file:text-white"
+            type="file"
+            accept="video/mp4,video/quicktime,video/x-matroska,video/webm"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+          />
+        ) : (
+          <div>
+            <input
+              className="input"
+              type="url"
+              inputMode="url"
+              placeholder="https://www.youtube.com/watch?v=…"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+            />
+            <p className="mt-1 text-[11px] text-gray-500">
+              Only use videos you own or have the rights to (your uploads,
+              Creative-Commons / public-domain, or with permission).
+            </p>
+          </div>
+        )}
