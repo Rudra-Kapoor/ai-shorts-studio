@@ -225,3 +225,24 @@ def _normalize(raw, duration):
             "reason": str(c.get("reason", ""))[:200],
         })
     return out
+
+
+def _select(cands):
+    """Judge pass over already-snapped candidates: keep valid-length clips, drop
+    weak/overlapping, keep the best and spread them out."""
+    valid = [c for c in cands
+             if config.MIN_CLIP_SEC <= (c["end"] - c["start"]) <= config.MAX_CLIP_SEC]
+    pool0 = valid or cands  # very short videos may not reach MIN — keep them anyway
+    pool0.sort(key=lambda x: x["virality"], reverse=True)
+    # Prefer clips actually worth clipping; if none clear the bar, keep the best one.
+    strong = [c for c in pool0 if c["virality"] >= config.MIN_VIRALITY]
+    pool = strong or pool0[:1]
+
+    picked = []
+    for c in pool:
+        if all(c["end"] <= p["start"] or c["start"] >= p["end"] for p in picked):
+            picked.append(c)
+        if len(picked) >= config.MAX_CLIPS:
+            break
+    picked.sort(key=lambda x: x["start"])  # chronological for display
+    return picked
