@@ -91,3 +91,11 @@ WHISPER_MAX_MB = _int("WHISPER_MAX_MB", 24)
 CHUNK_SEC = _int("CHUNK_SEC", 600)
 # Trend RAG (Gemini embeddings + Mongo). Disabled automatically if no key/seed.
 GEMINI_EMBED_MODEL = os.getenv("GEMINI_EMBED_MODEL", "text-embedding-004")
+
+# Auto-post — YouTube (OAuth refresh-token flow). All optional.
+YT_CLIENT_ID = os.getenv("YT_CLIENT_ID", "")
+YT_CLIENT_SECRET = os.getenv("YT_CLIENT_SECRET", "")
+YT_REFRESH_TOKEN = os.getenv("YT_REFRESH_TOKEN", "")
+# Auto-post — Instagram (Graph API, business/creator account). All optional.
+IG_USER_ID = os.getenv("IG_USER_ID", "")
+IG_ACCESS_TOKEN = os.getenv("IG_ACCESS_TOKEN", "")
