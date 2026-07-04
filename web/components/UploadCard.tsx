@@ -86,3 +86,49 @@ export default function UploadCard({
       });
       const regJson = await reg.json();
       if (!reg.ok) throw new Error(regJson.error || "could not register video");
+
+      setFile(null);
+      setTitle("");
+      setPct(0);
+      if (inputRef.current) inputRef.current.value = "";
+      onCreated();
+    } catch (e: any) {
+      setError(e.message || "something went wrong");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // --- Paste a link: the worker downloads it, then runs the same pipeline ---
+  async function startUrl() {
+    const link = url.trim();
+    if (!link) return;
+    if (!/^https?:\/\/\S+$/i.test(link)) {
+      setError("Enter a valid video link (https://…)");
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const reg = await fetch("/api/videos", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          userId: me.userId,
+          title: title || undefined,
+          sourceUrl: link,
+          captionStyle,
+          aspectRatio,
+        }),
+      });
+      const regJson = await reg.json();
+      if (!reg.ok) throw new Error(regJson.error || "could not start");
+      setUrl("");
+      setTitle("");
+      onCreated();
+    } catch (e: any) {
+      setError(e.message || "something went wrong");
+    } finally {
+      setBusy(false);
+    }
+  }
