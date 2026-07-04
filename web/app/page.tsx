@@ -57,3 +57,36 @@ export default function Home() {
         }}
       />
     );
+
+  return (
+    <div>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">Your Studio</h1>
+          <p className="text-sm text-gray-400">Signed in as {me.email}</p>
+        </div>
+        <div className="flex items-center gap-3">
+          {usage && (
+            <span
+              className={`badge ${
+                usage.remaining > 0
+                  ? "bg-emerald-500/15 text-emerald-300"
+                  : "bg-red-500/15 text-red-300"
+              }`}
+              title="Videos you can process today"
+            >
+              {usage.remaining}/{usage.limit} left today
+            </span>
+          )}
+          <button
+            className="btn-ghost text-sm"
+            onClick={() => {
+              signOut();
+              setMe(null);
+              setUsage(null);
+            }}
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
