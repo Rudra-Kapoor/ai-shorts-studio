@@ -35,3 +35,24 @@ def probe_media(video_path: str) -> dict:
         elif kind == "audio":
             has_audio = True
     return {"duration": duration, "width": width, "height": height, "has_audio": has_audio}
+
+
+def extract_frames(src_video: str, start: float, end: float, n: int, out_dir: str,
+                   prefix: str = "f") -> list:
+    """Grab n evenly-spaced small JPEG frames from [start, end] (for vision
+    scoring and face detection). Fast input-seek; downscaled to keep them tiny."""
+    dur = max(0.2, end - start)
+    paths = []
+    for i in range(n):
+        t = start + dur * ((i + 0.5) / n)
+        p = os.path.join(out_dir, f"{prefix}_{i}.jpg")
+        try:
+            subprocess.run(
+                ["ffmpeg", "-y", "-ss", f"{t:.3f}", "-i", src_video,
+                 "-frames:v", "1", "-q:v", "3", "-vf", "scale=640:-1", p],
+                check=True, capture_output=True,
+            )
+            paths.append(p)
+        except subprocess.CalledProcessError:
+            continue
+    return paths
