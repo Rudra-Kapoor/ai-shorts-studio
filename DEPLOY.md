@@ -94,3 +94,20 @@ git push -u origin main
 | `UPSTASH_REDIS_REST_URL` | from step 3 |
 | `UPSTASH_REDIS_REST_TOKEN` | from step 3 |
 | `WORKER_SECRET` | your secret from step 6 |
+
+*(`MONGODB_DB`, `R2_BUCKET`, and the tuning vars already have defaults.)*
+
+3. Click **Apply / Deploy**. Wait for the build (a few minutes).
+4. 📋 Copy your worker URL, e.g. `https://ai-shorts-worker.onrender.com`.
+5. Test it: open `<worker-url>/health` in your browser → should show `{"ok":true}`.
+
+> Not using Render? The same Docker image runs on Hugging Face Spaces, Google
+> Cloud Run, or Fly.io — just set the same env vars.
+
+---
+
+## 8) Deploy the WEB app → Vercel (free)
+
+1. https://vercel.com → **Add New → Project** → import the same repo.
+2. **IMPORTANT: set _Root Directory_ to `web`.**
+3. Add these Environment Variables:
