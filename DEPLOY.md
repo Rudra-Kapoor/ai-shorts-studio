@@ -76,3 +76,21 @@ git push -u origin main
 **same** value into Render *and* Vercel.
 
 ---
+
+## 7) Deploy the WORKER → Render (free, Docker)
+
+1. https://render.com → **New → Blueprint** → connect your GitHub repo.
+   Render reads `render.yaml` automatically.
+2. It will ask for the env vars below. Fill them with your 📋 values:
+
+| Key | Value |
+|---|---|
+| `GROQ_API_KEY` | your `gsk_…` |
+| `GEMINI_API_KEY` | your `AIza…` |
+| `MONGODB_URI` | your `mongodb+srv://…` |
+| `R2_ACCOUNT_ID` | from step 1 |
+| `R2_ACCESS_KEY_ID` | from step 1 |
+| `R2_SECRET_ACCESS_KEY` | from step 1 |
+| `UPSTASH_REDIS_REST_URL` | from step 3 |
+| `UPSTASH_REDIS_REST_TOKEN` | from step 3 |
+| `WORKER_SECRET` | your secret from step 6 |
